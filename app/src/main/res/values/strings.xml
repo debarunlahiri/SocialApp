@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Social App</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="description_permission">Storage Files Access is needed in order to save your downloaded files and for WhatsApp Status Saver To work, some features may not work if don\'t allow this permission</string>
+
+</resources>

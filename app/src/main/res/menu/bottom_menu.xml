@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/stop_watch_menu_home_list_item"
+        android:icon="@drawable/ic_outline_watch_24"
+        android:title="Stop Watch"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/youtube_menu_home_list_item"
+        android:icon="@drawable/ic_outline_ondemand_video_24"
+        android:title="Youtube"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/radio_menu_home_list_item"
+        android:icon="@drawable/ic_outline_radio_24"
+        android:title="Radio"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/group_chat_menu_home_list_item"
+        android:icon="@drawable/ic_outline_group_24"
+        android:title="Group Chat"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/events_menu_home_list_item"
+        android:icon="@drawable/ic_outline_event_24"
+        android:title="Events"
+        app:showAsAction="always"/>
+</menu>
