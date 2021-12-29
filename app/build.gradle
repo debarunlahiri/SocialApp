@@ -43,4 +43,5 @@ dependencies {
     implementation 'com.github.piasy:rxandroidaudio:1.7.0'
     implementation 'com.github.piasy:AudioProcessor:1.7.0'
     implementation 'com.karumi:dexter:6.2.3'
+    implementation 'com.github.mergehez:ArgPlayer:v3.0.1'
 }
