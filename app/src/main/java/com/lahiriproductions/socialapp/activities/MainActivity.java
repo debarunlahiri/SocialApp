@@ -13,6 +13,12 @@ import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.lahiriproductions.socialapp.R;
 import com.lahiriproductions.socialapp.adapter.BottomViewPagerAdapter;
 import com.lahiriproductions.socialapp.utils.MyBroadcastService;
@@ -20,12 +26,20 @@ import com.lahiriproductions.socialapp.utils.MyBroadcastService;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private BottomNavigationView bottomNavigationView;
-    private ViewPager vpMain;
 
     private Toolbar tbMain;
 
+
+    private BottomNavigationView bottomNavigationView;
+    private ViewPager vpMain;
+
     private BottomViewPagerAdapter bottomViewPagerAdapter;
+
+    private DatabaseReference mDatabase;
+    private FirebaseUser currentUser;
+    private FirebaseAuth mAuth;
+    private FirebaseStorage mStorage;
+    private StorageReference storageReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,9 +56,22 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         vpMain = findViewById(R.id.vpMain);
 
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+        mStorage = FirebaseStorage.getInstance();
+        storageReference = mStorage.getReferenceFromUrl(getString(R.string.storage_reference_url));
+
         bottomViewPagerAdapter = new BottomViewPagerAdapter(getSupportFragmentManager());
         vpMain.setAdapter(bottomViewPagerAdapter);
         vpMain.setOffscreenPageLimit(5);
+
+        if (currentUser == null) {
+            sendToMain();
+        } else {
+
+        }
+
 
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -89,5 +116,11 @@ public class MainActivity extends AppCompatActivity {
 //                .disallowAddToBackStack()
 //                .commit();
 
+    }
+
+    private void sendToMain() {
+        Intent mainIntent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(mainIntent);
+        finish();
     }
 }

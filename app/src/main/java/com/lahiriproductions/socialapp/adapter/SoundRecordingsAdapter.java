@@ -17,6 +17,7 @@ import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.helper.widget.Layer;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.lahiriproductions.socialapp.R;
 import com.lahiriproductions.socialapp.activities.SoundRecordingsActivity;
 import com.lahiriproductions.socialapp.models.SoundRecordings;
@@ -34,6 +35,7 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
     private MediaPlayer mediaPlayer;
     private int currentPlayingPosition;
     private ViewHolder playingHolder;
+    private int playingPosition;
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
@@ -63,6 +65,16 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
         editor = sharedPreferences.edit();
         holder.tvSoundFileName.setText(soundRecordings.getAbsolutePath().substring(soundRecordings.getAbsolutePath().lastIndexOf("/")+1));
         holder.tvSoundFileFormat.setText("MP3 File");
+        mediaPlayer = MediaPlayer.create(mContext, Uri.parse(soundRecordings.getAbsolutePath()));
+        if (position == playingPosition) {
+            playingHolder = holder;
+            // this view holder corresponds to the currently playing audio cell
+            // update its view to show playing progress
+            updatePlayingView();
+        } else {
+            // and this one corresponds to non playing
+            updateNonPlayingView(holder);
+        }
         holder.cvSoundRecording.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -76,7 +88,7 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
                     currentPlayingPosition = position;
                     if (mediaPlayer != null) {
                         if (null != holder) {
-                            updateNonPlayingView(holder);
+                            updateNonPlayingView(playingHolder);
                         }
                         mediaPlayer.release();
                     }
@@ -102,6 +114,9 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
 //        holder.sbProgress.setEnabled(false);
 //        holder.sbProgress.setProgress(0);
 //        holder.ivPlayPause.setImageResource(R.drawable.ic_play_arrow);
+        holder.animationView.setVisibility(View.GONE);
+        holder.ivMusicArt.setVisibility(View.VISIBLE);
+
     }
 
     private void updatePlayingView() {
@@ -115,6 +130,13 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
 //            playingHolder.sbProgress.removeCallbacks(seekBarUpdater);
 //            playingHolder.ivPlayPause.setImageResource(R.drawable.ic_play_arrow);
 //        }
+        if (mediaPlayer.isPlaying()) {
+            playingHolder.animationView.setVisibility(View.VISIBLE);
+            playingHolder.ivMusicArt.setVisibility(View.GONE);
+        } else {
+            playingHolder.animationView.setVisibility(View.GONE);
+            playingHolder.ivMusicArt.setVisibility(View.VISIBLE);
+        }
     }
 
     private void startMediaPlayer(File audioFile, ViewHolder holder) {
@@ -123,6 +145,8 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
             @Override
             public void onCompletion(MediaPlayer mp) {
                 releaseMediaPlayer();
+                playingHolder.animationView.setVisibility(View.GONE);
+                playingHolder.ivMusicArt.setVisibility(View.VISIBLE);
             }
         });
         mediaPlayer.start();
@@ -138,6 +162,17 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
     }
 
     @Override
+    public void onViewRecycled(ViewHolder holder) {
+        super.onViewRecycled(holder);
+        if (currentPlayingPosition == holder.getAdapterPosition()) {
+            if (playingHolder != null) {
+                updateNonPlayingView(playingHolder);
+            }
+            playingHolder = null;
+        }
+    }
+
+    @Override
     public int getItemCount() {
         return soundRecordingsList.size();
     }
@@ -146,7 +181,8 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
 
         private TextView tvSoundFileName, tvSoundFileFormat;
         private CardView cvSoundRecording;
-        private ImageView ivSoundSelect;
+        private ImageView ivSoundSelect, ivMusicArt;
+        private LottieAnimationView animationView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -155,6 +191,8 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
             tvSoundFileFormat = itemView.findViewById(R.id.tvSoundFileFormat);
             cvSoundRecording = itemView.findViewById(R.id.cvSoundRecording);
             ivSoundSelect = itemView.findViewById(R.id.ivSoundSelect);
+            animationView = itemView.findViewById(R.id.animationView);
+            ivMusicArt = itemView.findViewById(R.id.ivMusicArt);
         }
     }
 

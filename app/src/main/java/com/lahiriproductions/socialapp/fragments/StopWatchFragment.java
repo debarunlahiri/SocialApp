@@ -4,6 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -26,6 +29,7 @@ import com.lahiriproductions.socialapp.R;
 import com.lahiriproductions.socialapp.activities.SoundRecordingsActivity;
 import com.lahiriproductions.socialapp.adapter.StopWatchLapAdapter;
 import com.lahiriproductions.socialapp.models.StopWatchLap;
+import com.lahiriproductions.socialapp.utils.Constants;
 import com.lahiriproductions.socialapp.utils.MyBroadcastService;
 import com.yashovardhan99.timeit.Stopwatch;
 
@@ -50,7 +54,7 @@ public class StopWatchFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private TextView tvStopWatch, tvSoundRecordings;
+    private TextView tvStopWatch, tvSoundRecordings, tvSelectedAudioName;
 
     private com.yashovardhan99.timeit.Stopwatch stopwatch;
 
@@ -67,6 +71,11 @@ public class StopWatchFragment extends Fragment {
     private boolean isPaused = false;
     private boolean isStarted = false;
     private boolean isReset = false;
+
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+    private String selectedAudioPath;
+    private MediaPlayer mediaPlayer;
 
 
     public StopWatchFragment() {
@@ -113,12 +122,16 @@ public class StopWatchFragment extends Fragment {
 
         mContext = getActivity();
 
+        sharedPreferences = mContext.getSharedPreferences(Constants.SELECTED_AUDIO, Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+
         tvStopWatch = view.findViewById(R.id.tvStopWatch);
         ibPlayPause = view.findViewById(R.id.ibPlayPause);
         ibReset = view.findViewById(R.id.ibReset);
         bSetLap = view.findViewById(R.id.bSetLap);
         tvSoundRecordings = view.findViewById(R.id.tvSoundRecordings);
         ibPause = view.findViewById(R.id.ibPause);
+        tvSelectedAudioName = view.findViewById(R.id.tvSelectedAudioName);
 
         stopwatch = new com.yashovardhan99.timeit.Stopwatch();
 
@@ -129,6 +142,15 @@ public class StopWatchFragment extends Fragment {
         rvStopWatchLap.setAdapter(stopWatchLapAdapter);
 
         tvStopWatch.setText("0.00s");
+
+        tvSelectedAudioName.setVisibility(View.GONE);
+
+        if (sharedPreferences.contains(Constants.SELECTED_AUDIO_PATH)) {
+            selectedAudioPath = sharedPreferences.getString(Constants.SELECTED_AUDIO_PATH, "");
+            tvSelectedAudioName.setText("Selected Audio - " + selectedAudioPath.substring(selectedAudioPath.lastIndexOf("/")+1));
+            mediaPlayer = MediaPlayer.create(mContext, Uri.parse(selectedAudioPath));
+        }
+
 
         ibPlayPause.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,6 +163,11 @@ public class StopWatchFragment extends Fragment {
                         stopwatch.resume();
                         ibPlayPause.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_outline_pause_24));
                     } else {
+                        if (selectedAudioPath != null) {
+                            tvSelectedAudioName.setVisibility(View.VISIBLE);
+                        } else {
+                            tvSelectedAudioName.setVisibility(View.GONE);
+                        }
                         stopwatch.start();
                         ibPlayPause.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_outline_pause_24));
                     }
@@ -169,6 +196,8 @@ public class StopWatchFragment extends Fragment {
                 isReset = true;
                 tvStopWatch.setText("0.00s");
                 stopwatch.stop();
+                stopWatchLapList.clear();
+                stopWatchLapAdapter.notifyDataSetChanged();
             }
         });
 
@@ -180,6 +209,9 @@ public class StopWatchFragment extends Fragment {
                     stopWatchLapAdapter.setStopWatchLapList(stopWatchLapList);
                     stopwatch.stop();
                     stopwatch.start();
+                    if (selectedAudioPath != null) {
+                        mediaPlayer.start();
+                    }
                 }
             }
         });
@@ -192,6 +224,7 @@ public class StopWatchFragment extends Fragment {
                     stopwatch.stop();
                     stopwatch.start();
                     Log.e(TAG, "lapMilLi: " + String.format("%d", lapMilLi));
+                    ibPlayPause.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_outline_pause_24));
                 } else {
                     Toast.makeText(mContext, "Cannot set lap time when stop watch is paused", Toast.LENGTH_SHORT).show();
                 }

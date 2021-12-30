@@ -21,11 +21,22 @@
             android:orientation="vertical" >
 
             <TextView
+                android:id="@+id/tvSelectedAudioName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="32dp"
+                android:text="Selected Audio"
+                android:textSize="16sp"
+                android:textAlignment="center" />
+
+            <TextView
                 android:id="@+id/tvStopWatch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="32dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginEnd="32dp"
                 android:text="0.00s"
                 android:textAlignment="center"
