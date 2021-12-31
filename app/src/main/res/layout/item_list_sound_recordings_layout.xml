@@ -61,7 +61,7 @@
                 android:fontFamily="sans-serif-medium"
                 android:text="TextView"
                 android:textSize="16sp"
-                app:layout_constraintEnd_toStartOf="@+id/imageView"
+                app:layout_constraintEnd_toStartOf="@+id/ivSetRingtone"
                 app:layout_constraintStart_toEndOf="@+id/linearLayout"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -74,7 +74,7 @@
                 android:layout_marginBottom="8dp"
                 android:text="TextView"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/imageView"
+                app:layout_constraintEnd_toStartOf="@+id/ivSetRingtone"
                 app:layout_constraintStart_toEndOf="@+id/linearLayout"
                 app:layout_constraintTop_toBottomOf="@+id/tvSoundFileName" />
 
@@ -93,7 +93,7 @@
                 app:srcCompat="@drawable/ic_baseline_check_24" />
 
             <ImageView
-                android:id="@+id/imageView"
+                android:id="@+id/ivSetRingtone"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:padding="12dp"

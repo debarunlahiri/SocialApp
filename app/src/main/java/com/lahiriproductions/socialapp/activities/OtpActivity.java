@@ -2,8 +2,10 @@ package com.lahiriproductions.socialapp.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,6 +14,7 @@ import android.widget.EditText;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.AuthResult;
@@ -33,7 +36,10 @@ public class OtpActivity extends AppCompatActivity {
 
     private static final String TAG = OtpActivity.class.getSimpleName();
 
+    private Toolbar tbEnterOtp;
+
     private EditText etEnterOtp;
+    private TextInputLayout tilEnterOtp;
     private Button bOtpSubmit;
 
     private DatabaseReference mDatabase;
@@ -49,10 +55,25 @@ public class OtpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_otp);
 
+        tbEnterOtp = findViewById(R.id.tbEnterOtp);
+        tbEnterOtp.setTitle("Enter OTP");
+        tbEnterOtp.setTitleTextColor(Color.WHITE);
+        setSupportActionBar(tbEnterOtp);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        tbEnterOtp.setNavigationIcon(getResources().getDrawable(R.drawable.ic_baseline_white_arrow_back_24));
+        tbEnterOtp.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
         phone_number = getIntent().getExtras().getString("phone_number");
         verification_id = getIntent().getExtras().getString("verification_id");
 
         etEnterOtp = findViewById(R.id.etEnterOtp);
+        tilEnterOtp = findViewById(R.id.tilEnterOtp);
         bOtpSubmit = findViewById(R.id.bOtpSubmit);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -67,7 +88,7 @@ public class OtpActivity extends AppCompatActivity {
                 String otp = etEnterOtp.getText().toString();
 
                 if (otp.isEmpty()) {
-                    etEnterOtp.setError("Otp cannot be empty");
+                    tilEnterOtp.setError("Otp cannot be empty");
                 } else {
                     verifyOtp(otp);
                 }

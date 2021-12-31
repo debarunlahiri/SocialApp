@@ -1,13 +1,23 @@
 package com.lahiriproductions.socialapp.adapter;
 
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.media.MediaPlayer;
+import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
+import android.provider.MediaStore;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,8 +32,13 @@ import com.lahiriproductions.socialapp.R;
 import com.lahiriproductions.socialapp.activities.SoundRecordingsActivity;
 import com.lahiriproductions.socialapp.models.SoundRecordings;
 import com.lahiriproductions.socialapp.utils.Constants;
+import com.lahiriproductions.socialapp.utils.FileUtil;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordingsAdapter.ViewHolder> {
@@ -107,6 +122,71 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
                 Toast.makeText(mContext, "Audio selected successfully", Toast.LENGTH_SHORT).show();
             }
         });
+
+        holder.ivSetRingtone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkSystemWritePermission()) {
+                    setAsRingtoneAndroid(soundRecordings);
+                }
+            }
+        });
+    }
+
+    private boolean checkSystemWritePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if(Settings.System.canWrite(mContext))
+                return true;
+            else
+                openAndroidPermissionsMenu();
+        }
+        return false;
+    }
+
+    private void openAndroidPermissionsMenu() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+            intent.setData(Uri.parse("package:" + mContext.getPackageName()));
+            mContext.startActivity(intent);
+        }
+    }
+
+    private void setAsRingtoneAndroid(File k) {
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.MediaColumns.TITLE, k.getName());
+        values.put(MediaStore.MediaColumns.MIME_TYPE, getMIMEType(k.getAbsolutePath()));//// getMIMEType(k.getAbsolutePath())
+        values.put(MediaStore.MediaColumns.SIZE, k.length());
+        values.put(MediaStore.Audio.Media.ARTIST, R.string.app_name);
+        values.put(MediaStore.Audio.Media.IS_RINGTONE, true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            Uri newUri = mContext.getContentResolver()
+                    .insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values);
+            try (OutputStream os = mContext.getContentResolver().openOutputStream(newUri)) {
+                int size = (int) k.length();
+                byte[] bytes = new byte[size];
+                try {
+                    BufferedInputStream buf = new BufferedInputStream(new FileInputStream(k));
+                    buf.read(bytes, 0, bytes.length);
+                    buf.close();
+                    os.write(bytes);
+                    os.close();
+                    os.flush();
+                } catch (IOException e) {
+                }
+            } catch (Exception ignored) {
+            }
+            RingtoneManager.setActualDefaultRingtoneUri(mContext, RingtoneManager.TYPE_RINGTONE, newUri);
+            Toast.makeText(mContext, "Ringtone set", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public static String getMIMEType(String url) {
+        String mType = null;
+        String mExtension = MimeTypeMap.getFileExtensionFromUrl(url);
+        if (mExtension != null) {
+            mType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(mExtension);
+        }
+        return mType;
     }
 
     private void updateNonPlayingView(ViewHolder holder) {
@@ -181,7 +261,7 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
 
         private TextView tvSoundFileName, tvSoundFileFormat;
         private CardView cvSoundRecording;
-        private ImageView ivSoundSelect, ivMusicArt;
+        private ImageView ivSoundSelect, ivMusicArt, ivSetRingtone;
         private LottieAnimationView animationView;
 
         public ViewHolder(@NonNull View itemView) {
@@ -193,6 +273,7 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
             ivSoundSelect = itemView.findViewById(R.id.ivSoundSelect);
             animationView = itemView.findViewById(R.id.animationView);
             ivMusicArt = itemView.findViewById(R.id.ivMusicArt);
+            ivSetRingtone = itemView.findViewById(R.id.ivSetRingtone);
         }
     }
 

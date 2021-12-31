@@ -15,8 +15,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.lahiriproductions.socialapp.R;
@@ -69,7 +72,19 @@ public class MainActivity extends AppCompatActivity {
         if (currentUser == null) {
             sendToMain();
         } else {
+            mDatabase.child("users").child(currentUser.getUid()).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (!snapshot.exists()) {
+                        sendToProfile();
+                    }
+                }
 
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
         }
 
 
@@ -116,6 +131,12 @@ public class MainActivity extends AppCompatActivity {
 //                .disallowAddToBackStack()
 //                .commit();
 
+    }
+
+    private void sendToProfile() {
+        Intent mainIntent = new Intent(MainActivity.this, ProfileActivity.class);
+        startActivity(mainIntent);
+        finishAffinity();
     }
 
     private void sendToMain() {

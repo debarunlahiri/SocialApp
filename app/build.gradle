@@ -58,4 +58,8 @@ dependencies {
     def lottieVersion = "3.4.0"
     implementation "com.airbnb.android:lottie:$lottieVersion"
     implementation 'de.hdodenhof:circleimageview:3.1.0'
+    api 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
+    implementation 'id.zelory:compressor:2.1.1'
+    implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:core:11.0.1'
+
 }

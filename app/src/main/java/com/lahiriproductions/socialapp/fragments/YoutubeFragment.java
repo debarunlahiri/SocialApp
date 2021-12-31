@@ -2,13 +2,25 @@ package com.lahiriproductions.socialapp.fragments;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.lahiriproductions.socialapp.R;
+import com.lahiriproductions.socialapp.utils.Controller;
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,6 +37,13 @@ public class YoutubeFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private YouTubePlayerView youTubePlayerView;
+    private EditText etYoutubeUrl;
+    private ImageButton ibYoutubeClear;
+    private Button bYoutubeSubmit;
+    private LinearLayout llYoutube;
+    private FrameLayout flYoutubePlayer;
 
     public YoutubeFragment() {
         // Required empty public constructor
@@ -62,5 +81,51 @@ public class YoutubeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_youtube, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        youTubePlayerView = view.findViewById(R.id.youtube_player_view);
+        etYoutubeUrl = view.findViewById(R.id.etYoutubeUrl);
+        bYoutubeSubmit = view.findViewById(R.id.bYoutubeSubmit);
+        ibYoutubeClear = view.findViewById(R.id.ibYoutubeClear);
+        llYoutube = view.findViewById(R.id.llYoutube);
+        flYoutubePlayer = view.findViewById(R.id.flYoutubePlayer);
+
+        getLifecycle().addObserver(youTubePlayerView);
+
+        bYoutubeSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String youtube_url = etYoutubeUrl.getText().toString();
+
+                if (youtube_url.isEmpty()) {
+                    etYoutubeUrl.setError("Please enter youtube url");
+                } else if (Controller.extractYTId(youtube_url).equalsIgnoreCase("error")) {
+                    Toast.makeText(getActivity(), "Youtube url is not proper", Toast.LENGTH_SHORT).show();
+                } else {
+                    YouTubePlayerView youTubePlayerView = new YouTubePlayerView(getActivity());
+                    flYoutubePlayer.removeAllViews();
+                    flYoutubePlayer.addView(youTubePlayerView);
+                    youTubePlayerView.addYouTubePlayerListener(new AbstractYouTubePlayerListener() {
+                        @Override
+                        public void onReady(@NonNull YouTubePlayer youTubePlayer) {
+                            String videoId = Controller.extractYTId(youtube_url);
+                            youTubePlayer.loadVideo(videoId, 0);
+                        }
+                    });
+                }
+            }
+        });
+
+        ibYoutubeClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                etYoutubeUrl.setText("");
+            }
+        });
+
     }
 }

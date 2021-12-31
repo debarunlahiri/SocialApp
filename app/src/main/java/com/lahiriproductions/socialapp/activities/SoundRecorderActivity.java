@@ -112,7 +112,7 @@ public class SoundRecorderActivity extends AppCompatActivity {
                             stopwatch.stop();
                             Toast.makeText(mContext, "File saved", Toast.LENGTH_SHORT).show();
                         } else {
-                            mAudioFile = new File(file + File.separator + System.nanoTime() + ".m4a");
+                            mAudioFile = new File(file + File.separator + System.nanoTime() + ".mp3");
                             previousAudioRecordedFile = mAudioFile;
                             bStartRecording.setText("Stop Recording");
                             mAudioRecorder.prepareRecord(MediaRecorder.AudioSource.MIC,
