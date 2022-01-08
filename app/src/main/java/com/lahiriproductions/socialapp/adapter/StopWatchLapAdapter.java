@@ -40,7 +40,8 @@ public class StopWatchLapAdapter extends RecyclerView.Adapter<StopWatchLapAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         StopWatchLap stopWatchLap = stopWatchLapList.get(position);
-        holder.tvStopWatchLap.setText("#" + (position + 1) + "\t" + Controller.millisecondsToTime(stopWatchLap.getMilliseconds()));
+        holder.tvStopWatchCounter.setText("#" + (position + 1));
+        holder.tvStopWatchLap.setText(Controller.millisecondsToTime(stopWatchLap.getMilliseconds()));
     }
 
     @Override
@@ -50,12 +51,13 @@ public class StopWatchLapAdapter extends RecyclerView.Adapter<StopWatchLapAdapte
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView tvStopWatchLap;
+        private TextView tvStopWatchLap, tvStopWatchCounter;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             tvStopWatchLap = itemView.findViewById(R.id.tvStopWatchLap);
+            tvStopWatchCounter = itemView.findViewById(R.id.tvStopWatchCounter);
         }
     }
 }

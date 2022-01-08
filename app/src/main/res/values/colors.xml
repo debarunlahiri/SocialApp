@@ -1,5 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- Colors specific to Material themes. -->
+    <color name="background_material_dark">#ff212121</color>
+    <color name="background_material_light">#fffafafa</color>
+
+    <color name="ripple_material_light">#20444444</color>
+    <color name="ripple_material_dark">#20ffffff</color>
+
+    <color name="button_material_dark">#ff5a595b</color>
+    <color name="button_material_light">#ffd6d7d7</color>
+
+    <color name="bright_foreground_material_dark">@color/white</color>
+    <color name="bright_foreground_material_light">@color/black</color>
+    <!-- White 50% -->
+    <color name="bright_foreground_disabled_material_dark">#80ffffff</color>
+    <!-- Black 50% -->
+    <color name="bright_foreground_disabled_material_light">#80000000</color>
+    <color name="bright_foreground_inverse_material_dark">
+        @color/bright_foreground_material_light
+    </color>
+    <color name="bright_foreground_inverse_material_light">
+        @color/bright_foreground_material_dark
+    </color>
+
+    <color name="dim_foreground_material_dark">#ffbebebe</color>
+    <color name="dim_foreground_material_light">#ff323232</color>
+    <color name="dim_foreground_disabled_material_dark">#80bebebe</color>
+    <color name="dim_foreground_disabled_material_light">#80323232</color>
+
+    <color name="hint_foreground_material_dark">
+        @color/bright_foreground_disabled_material_dark
+    </color>
+    <color name="hint_foreground_material_light">
+        @color/bright_foreground_disabled_material_light
+    </color>
+    <!-- TODO: This is 40% alpha on the default accent color. -->
+    <color name="highlighted_text_material_dark">#6640c4ff</color>
+    <!-- TODO: This is 40% alpha on the default accent color. -->
+    <color name="highlighted_text_material_light">#6640c4ff</color>
+
+    <!-- Text & foreground colors -->
+    <eat-comment />
+
+    <!-- Black 87% -->
+    <color name="primary_text_default_material_light">#de000000</color>
+    <!-- Black 54% -->
+    <color name="secondary_text_material_light">#8a000000</color>
+    <!-- Black 54% (TODO: same as secondary?) -->
+    <color name="tertiary_text_material_light">#8a000000</color>
+
+    <!-- White 87% -->
+    <color name="primary_text_default_material_dark">#deffffff</color>
+    <!-- White 38% -->
+    <color name="secondary_text_material_dark">#61ffffff</color>
+    <!-- White 38% (TODO: same as secondary?) -->
+    <color name="tertiary_text_material_dark">#61ffffff</color>
+
+
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>

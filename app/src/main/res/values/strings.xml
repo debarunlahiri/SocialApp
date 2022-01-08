@@ -6,4 +6,26 @@
     <string name="description_permission">Storage Files Access is needed in order to save your downloaded files and for WhatsApp Status Saver To work, some features may not work if don\'t allow this permission</string>
     <string name="storage_reference_url">gs://takitym-2e39c.appspot.com</string>
 
+    <!-- media viewer and radio-->
+    <string name="volume_low">Turn your volume up!</string>
+    <string name="notification_playing">Now Playing</string>
+    <string name="toggle_fullscreen">Toggle Fullscreen</string>
+    <string name="audio_notification">Background media playback</string>
+    <string name="error_retry">Failed to connect to stream&#8230;</string>
+    <string name="error_retry_later">Please try again in a few seconds&#8230;</string>
+    <string name="radio_playing_other">Already playing another station. Press play again to play this station instead.</string>
+    <string name="empty_textview">Error loading data</string>
+
+    <string name="fiji">Fiji</string>
+    <string name="usa">United States of America</string>
+    <string name="new_zealand">New Zealand</string>
+    <string name="india">India</string>
+
+    <string-array name="radio_countries">
+        <item>Select Country</item>
+        <item>Fiji</item>
+        <item>United States of America</item>
+        <item>New Zealand</item>
+        <item>India</item>
+    </string-array>
 </resources>

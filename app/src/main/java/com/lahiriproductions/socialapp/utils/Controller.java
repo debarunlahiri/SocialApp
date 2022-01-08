@@ -1,8 +1,14 @@
 package com.lahiriproductions.socialapp.utils;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.webkit.MimeTypeMap;
+
+import com.lahiriproductions.socialapp.activities.LoginActivity;
+import com.lahiriproductions.socialapp.activities.MainActivity;
 
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -10,17 +16,9 @@ import java.util.regex.Pattern;
 
 public class Controller {
 
-    public static String millisecondsToTime(long milliseconds) {
-        long minutes = (milliseconds / 1000) / 60;
-        long seconds = (milliseconds / 1000) % 60;
-        String secondsStr = Long.toString(seconds);
-        String secs;
-        if (secondsStr.length() >= 2) {
-            secs = secondsStr.substring(0, 2);
-        } else {
-            secs = "0" + secondsStr;
-        }
+    public static Activity mainActivity;
 
+    public static String millisecondsToTime(long milliseconds) {
         return String.format("%02d:%02d:%02d",
                 TimeUnit.MILLISECONDS.toHours(milliseconds),
                 TimeUnit.MILLISECONDS.toMinutes(milliseconds) -
@@ -51,5 +49,11 @@ public class Controller {
             mType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(mExtension);
         }
         return mType;
+    }
+
+    public static void sendToLogin(Activity mActivity) {
+        Intent loginIntent = new Intent(mActivity, LoginActivity.class);
+        mActivity.startActivity(loginIntent);
+        mActivity.finishAffinity();
     }
 }

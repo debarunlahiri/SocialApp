@@ -1,14 +1,187 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.RadioFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+    <ImageView
+        android:id="@+id/ivRadioBg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/fiji_bg"
 
-</FrameLayout>
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Select Country"
+        app:layout_constraintEnd_toStartOf="@+id/ibRadioQuit"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Inside text input layout add
+              an auto complete text view
+                and make its input type to none-->
+        <AutoCompleteTextView
+            android:id="@+id/actRadioCountries"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:inputType="none"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvRadioArt"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="120dp"
+        android:layout_marginEnd="32dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
+
+        <ImageView
+            android:id="@+id/ivRadioArt"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:visibility="visible"
+            tools:src="@tools:sample/avatars"
+            tools:srcCompat="@drawable/bulafm" />
+
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/tvRadioName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="32dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/view2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cvRadioArt"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.gauravk.audiovisualizer.visualizer.CircleLineVisualizer
+        android:id="@+id/blast"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:visibility="gone"
+        app:avColor="@color/purple_500"
+        app:avDensity="0.8"
+        app:avSpeed="normal"
+        app:avType="fill"
+        app:layout_constraintBottom_toBottomOf="@+id/cvRadioArt"
+        app:layout_constraintEnd_toEndOf="@+id/cvRadioArt"
+        app:layout_constraintStart_toStartOf="@+id/cvRadioArt"
+        app:layout_constraintTop_toTopOf="@+id/cvRadioArt" />
+
+    <View
+        android:id="@+id/view2"
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:layout_marginBottom="16dp"
+        android:background="@color/md_grey_500"
+        app:layout_constraintBottom_toTopOf="@+id/ibRadioPlayPause"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/ibRadioQuit"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/color_circle_bg"
+        android:src="@drawable/ic_baseline_power_settings_new_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white" />
+
+    <ImageButton
+        android:id="@+id/ibRadioPrevious"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/color_circle_bg"
+        android:clickable="true"
+        android:foreground="?actionBarItemBackground"
+        android:src="@drawable/ic_baseline_skip_previous_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/ibRadioPlayPause"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:tint="@color/white" />
+
+    <ImageButton
+        android:id="@+id/ibRadioPlayPause"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/color_circle_bg"
+        android:clickable="true"
+        android:foreground="?actionBarItemBackground"
+        android:src="@drawable/ic_outline_play_arrow_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/ibRadioNext"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/ibRadioPrevious"
+        app:tint="@color/white" />
+
+    <ImageButton
+        android:id="@+id/ibRadioNext"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/color_circle_bg"
+        android:clickable="true"
+        android:foreground="?actionBarItemBackground"
+        android:src="@drawable/ic_baseline_skip_next_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/ibRadioPlayPause"
+        app:tint="@color/white" />
+
+    <ProgressBar
+        android:id="@+id/pbRadio"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/ibRadioPlayPause"
+        app:layout_constraintEnd_toEndOf="@+id/ibRadioPlayPause"
+        app:layout_constraintTop_toTopOf="@+id/ibRadioPlayPause" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,11 +1,16 @@
 package com.lahiriproductions.socialapp.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,11 +21,27 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.lahiriproductions.socialapp.R;
+import com.lahiriproductions.socialapp.adapter.YoutubeAdapter;
+import com.lahiriproductions.socialapp.models.Youtube;
 import com.lahiriproductions.socialapp.utils.Controller;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -38,12 +59,23 @@ public class YoutubeFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private YouTubePlayerView youTubePlayerView;
+    private Context mContext;
+
     private EditText etYoutubeUrl;
-    private ImageButton ibYoutubeClear;
     private Button bYoutubeSubmit;
     private LinearLayout llYoutube;
-    private FrameLayout flYoutubePlayer;
+    private TextInputLayout tilYoutubeUrl;
+
+    private RecyclerView rvYoutube;
+    private YoutubeAdapter youtubeAdapter;
+    private List<Youtube> youtubeList = new ArrayList<>();
+    private LinearLayoutManager linearLayoutManager;
+
+    private DatabaseReference mDatabase;
+    private FirebaseUser currentUser;
+    private FirebaseAuth mAuth;
+    private FirebaseStorage mStorage;
+    private StorageReference storageReference;
 
     public YoutubeFragment() {
         // Required empty public constructor
@@ -87,14 +119,58 @@ public class YoutubeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        youTubePlayerView = view.findViewById(R.id.youtube_player_view);
+        mContext = getActivity();
+
         etYoutubeUrl = view.findViewById(R.id.etYoutubeUrl);
         bYoutubeSubmit = view.findViewById(R.id.bYoutubeSubmit);
-        ibYoutubeClear = view.findViewById(R.id.ibYoutubeClear);
         llYoutube = view.findViewById(R.id.llYoutube);
-        flYoutubePlayer = view.findViewById(R.id.flYoutubePlayer);
+        tilYoutubeUrl = view.findViewById(R.id.tilYoutubeUrl);
 
-        getLifecycle().addObserver(youTubePlayerView);
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+        mStorage = FirebaseStorage.getInstance();
+        storageReference = mStorage.getReferenceFromUrl(getString(R.string.storage_reference_url));
+
+        rvYoutube = view.findViewById(R.id.rvYoutube);
+        youtubeAdapter = new YoutubeAdapter(mContext, youtubeList);
+        linearLayoutManager = new LinearLayoutManager(mContext);
+        linearLayoutManager.setReverseLayout(true);
+        linearLayoutManager.setStackFromEnd(true);
+        rvYoutube.setLayoutManager(linearLayoutManager);
+        rvYoutube.setAdapter(youtubeAdapter);
+
+        mDatabase.child("youtube_urls").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                if (snapshot.exists()) {
+                    Youtube youtube = snapshot.getValue(Youtube.class);
+                    youtubeList.add(youtube);
+                    youtubeAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
 
         bYoutubeSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,28 +178,21 @@ public class YoutubeFragment extends Fragment {
                 String youtube_url = etYoutubeUrl.getText().toString();
 
                 if (youtube_url.isEmpty()) {
-                    etYoutubeUrl.setError("Please enter youtube url");
+                    tilYoutubeUrl.setError("Please enter youtube url");
                 } else if (Controller.extractYTId(youtube_url).equalsIgnoreCase("error")) {
-                    Toast.makeText(getActivity(), "Youtube url is not proper", Toast.LENGTH_SHORT).show();
+                    tilYoutubeUrl.setError("Youtube url is not proper");
                 } else {
-                    YouTubePlayerView youTubePlayerView = new YouTubePlayerView(getActivity());
-                    flYoutubePlayer.removeAllViews();
-                    flYoutubePlayer.addView(youTubePlayerView);
-                    youTubePlayerView.addYouTubePlayerListener(new AbstractYouTubePlayerListener() {
-                        @Override
-                        public void onReady(@NonNull YouTubePlayer youTubePlayer) {
-                            String videoId = Controller.extractYTId(youtube_url);
-                            youTubePlayer.loadVideo(videoId, 0);
-                        }
-                    });
+                    String videoId = Controller.extractYTId(youtube_url);
+                    String youtube_id = mDatabase.child("youtube_urls").push().getKey().toString();
+                    HashMap<String, Object> mDataMap = new HashMap<>();
+                    mDataMap.put("youtube_url", youtube_url);
+                    mDataMap.put("youtube_video_id", videoId);
+                    mDataMap.put("user_id", currentUser.getUid());
+                    mDataMap.put("youtube_id", youtube_id);
+                    mDataMap.put("posted_on", System.currentTimeMillis());
+                    mDatabase.child("youtube_urls").child(youtube_id).setValue(mDataMap);
+                    etYoutubeUrl.setText("");
                 }
-            }
-        });
-
-        ibYoutubeClear.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                etYoutubeUrl.setText("");
             }
         });
 

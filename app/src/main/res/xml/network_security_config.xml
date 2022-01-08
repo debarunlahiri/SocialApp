@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">streamguys.com</domain>
+        <domain includeSubdomains="true">laut.fm</domain>
+        <domain includeSubdomains="true">tempo.fm</domain>
+        <domain includeSubdomains="true">radionomy.com</domain>
+        <domain includeSubdomains="true">streamguys1.com</domain>
+        <domain includeSubdomains="true">103.16.47.70</domain>
+        <domain includeSubdomains="true">strm112.1.fm</domain>
+        <domain includeSubdomains="true">listenon.in</domain>
+        <domain includeSubdomains="true">162.244.80.52</domain>
+        <domain includeSubdomains="true">airtime.pro</domain>
+        <domain includeSubdomains="true">95bfm.com</domain>
+        <domain includeSubdomains="true">fijiradio.net</domain>
+        <domain includeSubdomains="true">fijivillage.com</domain>
+        <domain includeSubdomains="true">voscast.com</domain>
+    </domain-config>
+</network-security-config>

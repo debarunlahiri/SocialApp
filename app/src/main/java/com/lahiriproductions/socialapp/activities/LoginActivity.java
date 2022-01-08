@@ -9,13 +9,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
@@ -26,7 +24,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.hbb20.CountryCodePicker;
 import com.lahiriproductions.socialapp.R;
+import com.tomer.fadingtextview.FadingTextView;
 
 import java.util.concurrent.TimeUnit;
 
@@ -37,6 +37,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etLoginPhoneNumber;
     private Button bLogin;
     private TextView tvReceivingOtpIndicator;
+    FadingTextView fadingTextView;
 
     private DatabaseReference mDatabase;
     private FirebaseUser currentUser;
@@ -48,6 +49,11 @@ public class LoginActivity extends AppCompatActivity {
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private String phone_number;
+    private CountryCodePicker ccp;
+
+    String[] text
+            = { "Monitor your lap with stopwatch", "Watch & add YouTube videos",
+            "Listen to Radio", "Chat with others", "See events which are happening" };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +63,10 @@ public class LoginActivity extends AppCompatActivity {
         etLoginPhoneNumber = findViewById(R.id.etLoginPhoneNumber);
         bLogin = findViewById(R.id.bLogin);
         tvReceivingOtpIndicator = findViewById(R.id.tvReceivingOtpIndicator);
+        ccp = findViewById(R.id.ccp);
+        fadingTextView = findViewById(R.id.fadingTextView);
+
+        fadingTextView.setTexts(text);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
@@ -72,6 +82,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (phone_number.isEmpty()) {
                     etLoginPhoneNumber.setText("Phone number cannot be empty");
                 } else {
+                    phone_number = ccp.getSelectedCountryCodeWithPlus() + phone_number;
                     initSignIn(phone_number);
                 }
             }
@@ -135,7 +146,7 @@ public class LoginActivity extends AppCompatActivity {
     private void initSignIn(String phone_number) {
         PhoneAuthOptions options =
                 PhoneAuthOptions.newBuilder(mAuth)
-                        .setPhoneNumber("+91" + phone_number)       // Phone number to verify
+                        .setPhoneNumber(phone_number)       // Phone number to verify
                         .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
                         .setActivity(this)                 // Activity (for callback binding)
                         .setCallbacks(mCallbacks)          // OnVerificationStateChangedCallbacks

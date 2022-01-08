@@ -25,8 +25,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -69,7 +72,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private Uri profilePictureURI = null;
     private Bitmap mCompressedProfileImage;
-    private FirebaseUser firebaseUser;
+    private ProgressDialog progressDialog;
 
 
     @Override
@@ -78,10 +81,6 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         mContext = ProfileActivity.this;
-
-        firebaseUser = getIntent().getParcelableExtra("user");
-
-        Log.e(TAG, "onCreate: " + firebaseUser);
 
         tbProfile = findViewById(R.id.tbProfile);
         tbProfile.setTitle("Profile");
@@ -102,6 +101,44 @@ public class ProfileActivity extends AppCompatActivity {
         currentUser = mAuth.getCurrentUser();
         mStorage = FirebaseStorage.getInstance();
         storageReference = mStorage.getReferenceFromUrl(getString(R.string.storage_reference_url));
+
+        if (currentUser == null) {
+            Controller.sendToLogin(ProfileActivity.this);
+        } else {
+            mDatabase.child("users").child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        String name = snapshot.child("name").getValue().toString();
+                        String email = snapshot.child("email").getValue().toString();
+                        String age = snapshot.child("age").getValue().toString();
+                        if (!snapshot.child("profile_image").exists()) {
+                            Glide.with(ProfileActivity.this).load(R.drawable.default_profile).into(civProfileImage);
+                        } else {
+                            Glide.with(ProfileActivity.this).load(snapshot.child("profile_image").getValue().toString()).into(civProfileImage);
+                        }
+                        etProfileAge.setText(age);
+                        etProfileFullName.setText(name);
+                        etProfileEmail.setText(email);
+
+                        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                        getSupportActionBar().setDisplayShowHomeEnabled(true);
+                        tbProfile.setNavigationIcon(getResources().getDrawable(R.drawable.ic_baseline_white_arrow_back_24));
+                        tbProfile.setNavigationOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                onBackPressed();
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
 
         civProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,10 +193,47 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
 
+
+
     private void updateProfile(String name, String email, String age) {
-        uploadProfilePic(name, email, age);
+        if (profilePictureURI == null) {
+            saveProfile(name, email, age, null);
+        } else {
+            uploadProfilePic(name, email, age);
+
+        }
 
 
+    }
+
+    private void saveProfile(String name, String email, String age, Uri downloadUri) {
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Please wait...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        HashMap<String, Object> mDataMap = new HashMap<>();
+        mDataMap.put("user_id", currentUser.getUid());
+        mDataMap.put("name", name);
+        mDataMap.put("email", email);
+        mDataMap.put("age", age);
+        if (downloadUri != null) {
+            mDataMap.put("profile_image", downloadUri.toString());
+        }
+        mDataMap.put("created_on", System.currentTimeMillis());
+        mDatabase.child("users").child(currentUser.getUid()).updateChildren(mDataMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    progressDialog.dismiss();
+                    Toast.makeText(mContext, "Profile saved successfully", Toast.LENGTH_LONG).show();
+                    sendToMain();
+                } else {
+                    progressDialog.dismiss();
+                    String errMsg = task.getException().getMessage();
+                    Toast.makeText(getApplicationContext(), "Error: " + errMsg, Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
     @Override
@@ -193,10 +267,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void uploadProfilePic(String name, String email, String age) {
-        ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Please wait...");
-        progressDialog.setCancelable(false);
-        progressDialog.show();
+
         final Long ts_long = System.currentTimeMillis() / 1000;
         final String ts = ts_long.toString();
         File mFileProfileImage = new File(profilePictureURI.getPath());
@@ -236,27 +307,7 @@ public class ProfileActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 Uri downloadUri = task.getResult();
                                 //final String product_key = mDatabase.child("products").child(item).push().getKey();
-                                HashMap<String, Object> mDataMap = new HashMap<>();
-                                mDataMap.put("user_id", currentUser.getUid());
-                                mDataMap.put("name", name);
-                                mDataMap.put("email", email);
-                                mDataMap.put("age", age);
-                                mDataMap.put("profile_image", downloadUri.toString());
-                                mDataMap.put("created_on", System.currentTimeMillis());
-                                mDatabase.child("users").child(currentUser.getUid()).updateChildren(mDataMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            progressDialog.dismiss();
-                                            Toast.makeText(mContext, "Profile saved successfully", Toast.LENGTH_LONG).show();
-                                            sendToMain();
-                                        } else {
-                                            progressDialog.dismiss();
-                                            String errMsg = task.getException().getMessage();
-                                            Toast.makeText(getApplicationContext(), "Error: " + errMsg, Toast.LENGTH_LONG).show();
-                                        }
-                                    }
-                                });
+                                saveProfile(name, email, age, downloadUri);
                             } else {
                                 progressDialog.dismiss();
                                 Toast.makeText(getApplicationContext(), "Image Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();

@@ -25,6 +25,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.lahiriproductions.socialapp.R;
 import com.lahiriproductions.socialapp.activities.SoundRecordingsActivity;
 import com.lahiriproductions.socialapp.adapter.StopWatchLapAdapter;
@@ -54,7 +55,7 @@ public class StopWatchFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private TextView tvStopWatch, tvSoundRecordings, tvSelectedAudioName;
+    private TextView tvStopWatch, tvSelectedAudioName;
 
     private com.yashovardhan99.timeit.Stopwatch stopwatch;
 
@@ -67,7 +68,7 @@ public class StopWatchFragment extends Fragment {
     private List<StopWatchLap> stopWatchLapList = new ArrayList<>();
 
     private ImageButton ibPlayPause, ibReset, ibPause;
-    private Button bSetLap;
+    private Button bSetLap, bSoundRecordings;
     private boolean isPaused = false;
     private boolean isStarted = false;
     private boolean isReset = false;
@@ -76,6 +77,7 @@ public class StopWatchFragment extends Fragment {
     private SharedPreferences.Editor editor;
     private String selectedAudioPath;
     private MediaPlayer mediaPlayer;
+    private boolean isDurationMessageShown = false;
 
 
     public StopWatchFragment() {
@@ -129,7 +131,7 @@ public class StopWatchFragment extends Fragment {
         ibPlayPause = view.findViewById(R.id.ibPlayPause);
         ibReset = view.findViewById(R.id.ibReset);
         bSetLap = view.findViewById(R.id.bSetLap);
-        tvSoundRecordings = view.findViewById(R.id.tvSoundRecordings);
+        bSoundRecordings = view.findViewById(R.id.bSoundRecordings);
         ibPause = view.findViewById(R.id.ibPause);
         tvSelectedAudioName = view.findViewById(R.id.tvSelectedAudioName);
 
@@ -198,6 +200,7 @@ public class StopWatchFragment extends Fragment {
                 stopwatch.stop();
                 stopWatchLapList.clear();
                 stopWatchLapAdapter.notifyDataSetChanged();
+                ibPlayPause.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_outline_play_arrow_24));
             }
         });
 
@@ -211,6 +214,18 @@ public class StopWatchFragment extends Fragment {
                     stopwatch.start();
                     if (selectedAudioPath != null) {
                         mediaPlayer.start();
+                        Log.e(TAG, "onTick: " + (mediaPlayer.getDuration()));
+                        if (mediaPlayer.getDuration() > lapMilLi) {
+                            if (!isDurationMessageShown) {
+                                new MaterialDialog.Builder(getActivity())
+                                        .title("Info")
+                                        .content("Your audio duration is greater than your lap time. Your sound may get overlap with other lap times.")
+                                        .positiveText("Okay")
+                                        .show();
+                                isDurationMessageShown = true;
+                            }
+
+                        }
                     }
                 }
             }
@@ -232,7 +247,7 @@ public class StopWatchFragment extends Fragment {
             }
         });
 
-        tvSoundRecordings.setOnClickListener(new View.OnClickListener() {
+        bSoundRecordings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(mContext, SoundRecordingsActivity.class));

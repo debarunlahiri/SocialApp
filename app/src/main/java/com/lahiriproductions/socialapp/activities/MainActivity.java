@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -24,6 +25,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.lahiriproductions.socialapp.R;
 import com.lahiriproductions.socialapp.adapter.BottomViewPagerAdapter;
+import com.lahiriproductions.socialapp.utils.Controller;
 import com.lahiriproductions.socialapp.utils.MyBroadcastService;
 
 public class MainActivity extends AppCompatActivity {
@@ -52,6 +54,10 @@ public class MainActivity extends AppCompatActivity {
         tbMain = findViewById(R.id.tbMain);
         tbMain.setTitleTextColor(Color.WHITE);
         setSupportActionBar(tbMain);
+
+        Controller.mainActivity = MainActivity.this;
+
+
 
         startService(new Intent(this, MyBroadcastService.class));
         Log.i(TAG, "Started service");
@@ -131,6 +137,25 @@ public class MainActivity extends AppCompatActivity {
 //                .disallowAddToBackStack()
 //                .commit();
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.edit_profile_menu_home_list_item:
+                Intent profileIntent = new Intent(MainActivity.this, ProfileActivity.class);
+                startActivity(profileIntent);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void sendToProfile() {

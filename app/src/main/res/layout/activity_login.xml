@@ -6,33 +6,106 @@
     android:layout_height="match_parent"
     tools:context=".activities.LoginActivity">
 
-    <EditText
-        android:id="@+id/etLoginPhoneNumber"
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/animationView"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="250dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="228dp"
+        android:layout_marginTop="50dp"
         android:layout_marginEnd="32dp"
-        android:ems="10"
-        android:hint="Phone Number"
-        android:inputType="phone"
+        android:tint="@color/purple_500"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_url="https://assets10.lottiefiles.com/packages/lf20_q5pk6p1k.json" />
 
-    <Button
-        android:id="@+id/bLogin"
+    <com.tomer.fadingtextview.FadingTextView
+        android:id="@+id/fadingTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:textColor="@color/button_material_dark"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/animationView"
+        app:timeout="2000" />
+
+    <androidx.cardview.widget.CardView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
-        android:text="Login"
-        android:textAllCaps="false"
+        android:layout_marginBottom="32dp"
+        app:cardCornerRadius="5dp"
+        app:cardElevation="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etLoginPhoneNumber" />
+        app:layout_constraintTop_toBottomOf="@+id/fadingTextView">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="12dp"
+            android:layout_marginBottom="20dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Login"
+                android:textAlignment="center"
+                android:textColor="@color/background_material_dark"
+                android:textSize="20sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.hbb20.CountryCodePicker
+                    android:id="@+id/ccp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|start">
+
+                </com.hbb20.CountryCodePicker>
+
+                <EditText
+                    android:id="@+id/etLoginPhoneNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:ems="10"
+                    android:hint="Phone Number"
+                    android:inputType="phone" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/bLogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="32dp"
+                android:text="Login"
+                android:textAllCaps="false" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/tvReceivingOtpIndicator"
@@ -44,6 +117,7 @@
         android:layout_marginBottom="32dp"
         android:text="Receiving otp"
         android:textAlignment="center"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

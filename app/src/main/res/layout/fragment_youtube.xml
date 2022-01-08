@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
     tools:context=".fragments.YoutubeFragment">
 
     <!-- TODO: Update blank fragment layout -->
@@ -19,35 +18,22 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilYoutubeUrl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:background="@drawable/border_corner_bg"
-                android:orientation="horizontal"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp">
+                app:endIconMode="clear_text"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-                <EditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etYoutubeUrl"
-                    android:layout_width="wrap_content"
-                    android:layout_height="45dp"
-                    android:layout_weight="1"
-                    android:background="@null"
-                    android:ems="10"
-                    android:hint="Enter Youtube Url"
-                    android:inputType="textPersonName"
-                    android:textColor="@color/white"
-                    android:textColorHint="@color/white" />
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter YouTube Url" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-                <ImageButton
-                    android:id="@+id/ibYoutubeClear"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:background="@null"
-                    android:src="@drawable/ic_baseline_clear_24"
-                    app:tint="@android:color/darker_gray" />
-            </LinearLayout>
+
 
             <Button
                 android:id="@+id/bYoutubeSubmit"
@@ -59,18 +45,10 @@
                 android:text="Submit"
                 android:textAllCaps="false" />
 
-            <FrameLayout
-                android:id="@+id/flYoutubePlayer"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvYoutube"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="32dp">
-
-                <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
-                    android:id="@+id/youtube_player_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone" />
-            </FrameLayout>
+                android:layout_height="match_parent" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
