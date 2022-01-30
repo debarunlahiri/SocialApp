@@ -1,5 +1,7 @@
 package com.lahiriproductions.socialapp.activities;
 
+import static com.lahiriproductions.socialapp.utils.Controller.sendNotification;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -73,6 +75,7 @@ public class ProfileActivity extends AppCompatActivity {
     private Uri profilePictureURI = null;
     private Bitmap mCompressedProfileImage;
     private ProgressDialog progressDialog;
+    private boolean isEdit = false;
 
 
     @Override
@@ -81,6 +84,10 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         mContext = ProfileActivity.this;
+
+        if (getIntent() != null) {
+            isEdit = getIntent().getBooleanExtra("isEdit", false);
+        }
 
         tbProfile = findViewById(R.id.tbProfile);
         tbProfile.setTitle("Profile");
@@ -224,6 +231,9 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
+                    if (isEdit) {
+                        sendNotification(mDatabase, currentUser.getUid(), "profile");
+                    }
                     progressDialog.dismiss();
                     Toast.makeText(mContext, "Profile saved successfully", Toast.LENGTH_LONG).show();
                     sendToMain();

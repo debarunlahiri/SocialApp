@@ -83,7 +83,8 @@ public class LoginActivity extends AppCompatActivity {
                     etLoginPhoneNumber.setText("Phone number cannot be empty");
                 } else {
                     phone_number = ccp.getSelectedCountryCodeWithPlus() + phone_number;
-                    initSignIn(phone_number);
+                    Log.e(TAG, "onClick: " + phone_number);
+                    sendToOtpActivity(phone_number);
                 }
             }
         });

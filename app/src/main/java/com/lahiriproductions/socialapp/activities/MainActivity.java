@@ -3,14 +3,22 @@ package com.lahiriproductions.socialapp.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationCompat;
 import androidx.viewpager.widget.ViewPager;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -27,16 +35,19 @@ import com.lahiriproductions.socialapp.R;
 import com.lahiriproductions.socialapp.adapter.BottomViewPagerAdapter;
 import com.lahiriproductions.socialapp.utils.Controller;
 import com.lahiriproductions.socialapp.utils.MyBroadcastService;
+import com.lahiriproductions.socialapp.utils.NonSwipeableViewPager;
+import com.lahiriproductions.socialapp.utils.NotificationEventReceiver;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String CHANNEL_ID = "3";
 
     private Toolbar tbMain;
 
 
     private BottomNavigationView bottomNavigationView;
-    private ViewPager vpMain;
+    private NonSwipeableViewPager vpMain;
 
     private BottomViewPagerAdapter bottomViewPagerAdapter;
 
@@ -45,14 +56,18 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseStorage mStorage;
     private StorageReference storageReference;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mContext = MainActivity.this;
+
         tbMain = findViewById(R.id.tbMain);
         tbMain.setTitleTextColor(Color.WHITE);
+        tbMain.setTitle("Stop Watch");
         setSupportActionBar(tbMain);
 
         Controller.mainActivity = MainActivity.this;
@@ -93,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -131,13 +145,51 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        getSupportFragmentManager()
-//                .beginTransaction()
-//                .add(R.id.flMain, new StopWatchFragment(), "StopWatchFragment")
-//                .disallowAddToBackStack()
-//                .commit();
+        mDatabase.child("notifications").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String sender_user_id = snapshot.child("sender_user_id").getValue().toString();
+                    String message = snapshot.child("message").getValue().toString();
+                    long timestamp = (long) snapshot.child("timestamp").getValue();
+                    String type = snapshot.child("type").getValue().toString();
 
+                    if (currentUser.getUid() != sender_user_id) {
+                        if (Math.abs(timestamp - System.currentTimeMillis()) <= 60000) {
+                            NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, CHANNEL_ID)
+                                    .setSmallIcon(R.mipmap.ic_launcher_round)
+                                    .setContentTitle(getResources().getString(R.string.app_name))
+                                    .setContentText(message)
+                                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                            NotificationEventReceiver.setupAlarm(getApplicationContext());
+
+                            // Create the NotificationChannel, but only on API 26+ because
+                            // the NotificationChannel class is new and not in the support library
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                CharSequence name = getString(R.string.channel_name);
+                                String description = getString(R.string.channel_description);
+                                int importance = NotificationManager.IMPORTANCE_DEFAULT;
+                                NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+                                channel.setDescription(description);
+                                // Register the channel with the system; you can't change the importance
+                                // or other notification behaviors after this
+                                NotificationManager notificationManager = getSystemService(NotificationManager.class);
+                                notificationManager.createNotificationChannel(channel);
+                                notificationManager.notify(12, builder.build());
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -150,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.edit_profile_menu_home_list_item:
                 Intent profileIntent = new Intent(MainActivity.this, ProfileActivity.class);
+                profileIntent.putExtra("isEdit", true);
                 startActivity(profileIntent);
                 return true;
 

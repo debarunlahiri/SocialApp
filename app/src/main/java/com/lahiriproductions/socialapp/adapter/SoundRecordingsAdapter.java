@@ -93,24 +93,29 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
         holder.cvSoundRecording.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (position == currentPlayingPosition) {
-                    if (mediaPlayer.isPlaying()) {
-                        mediaPlayer.pause();
-                    } else {
-                        mediaPlayer.start();
-                    }
-                } else {
-                    currentPlayingPosition = position;
-                    if (mediaPlayer != null) {
-                        if (null != holder) {
-                            updateNonPlayingView(playingHolder);
+                try {
+                    if (position == currentPlayingPosition) {
+                        if (mediaPlayer.isPlaying()) {
+                            mediaPlayer.pause();
+                        } else {
+                            mediaPlayer.start();
                         }
-                        mediaPlayer.release();
+                    } else {
+                        currentPlayingPosition = position;
+                        if (mediaPlayer != null) {
+                            if (null != holder) {
+                                updateNonPlayingView(playingHolder);
+                            }
+                            mediaPlayer.release();
+                        }
+                        playingHolder = holder;
+                        startMediaPlayer(soundRecordingsList.get(currentPlayingPosition), holder);
                     }
-                    playingHolder = holder;
-                    startMediaPlayer(soundRecordingsList.get(currentPlayingPosition), holder);
+                    updatePlayingView();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                updatePlayingView();
+
             }
         });
 
@@ -126,9 +131,14 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
         holder.ivSetRingtone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (checkSystemWritePermission()) {
-                    setAsRingtoneAndroid(soundRecordings);
+                try {
+                    if (checkSystemWritePermission()) {
+                        setAsRingtoneAndroid(soundRecordings);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+
             }
         });
     }

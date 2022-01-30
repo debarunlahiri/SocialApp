@@ -7,10 +7,13 @@ import androidx.appcompat.widget.Toolbar;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -40,7 +43,8 @@ public class OtpActivity extends AppCompatActivity {
 
     private EditText etEnterOtp;
     private TextInputLayout tilEnterOtp;
-    private Button bOtpSubmit;
+    private Button bOtpSubmit, bOTPResend;
+    private TextView tvOTPMessage;
 
     private DatabaseReference mDatabase;
     private FirebaseUser currentUser;
@@ -48,7 +52,10 @@ public class OtpActivity extends AppCompatActivity {
     private FirebaseStorage mStorage;
     private StorageReference storageReference;
 
-    private String phone_number, verification_id;
+    private String phone_number;
+    private String mVerificationId;
+    private PhoneAuthProvider.ForceResendingToken mResendToken;
+    private boolean isAlreadyResend = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,17 +77,20 @@ public class OtpActivity extends AppCompatActivity {
         });
 
         phone_number = getIntent().getExtras().getString("phone_number");
-        verification_id = getIntent().getExtras().getString("verification_id");
-
+        Log.e(TAG, "onClick: " + phone_number);
         etEnterOtp = findViewById(R.id.etEnterOtp);
         tilEnterOtp = findViewById(R.id.tilEnterOtp);
         bOtpSubmit = findViewById(R.id.bOtpSubmit);
+        tvOTPMessage = findViewById(R.id.tvOTPMessage);
+        bOTPResend = findViewById(R.id.bOTPResend);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         mStorage = FirebaseStorage.getInstance();
         storageReference = mStorage.getReferenceFromUrl(getString(R.string.storage_reference_url));
+
+        tvOTPMessage.setText("OTP has sent to this " + phone_number + " mobile number.");
 
         bOtpSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,8 +105,39 @@ public class OtpActivity extends AppCompatActivity {
             }
         });
 
+        bOTPResend.setOnClickListener(v -> {
+            if (isAlreadyResend) {
+                Toast.makeText(OtpActivity.this, "Sorry, you cannot send more otp request", Toast.LENGTH_SHORT).show();
+            } else {
+                isAlreadyResend = true;
+                bOTPResend.setVisibility(View.INVISIBLE);
+                sendOTP();
+            }
+        });
+
+        sendOTP();
+    }
+
+    private void countDownTimer() {
+        new CountDownTimer(60000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                bOTPResend.setText("Resend OTP in " + millisUntilFinished / 1000 + "s");
+                bOTPResend.setEnabled(false);
+                //here you can have your logic to set text to edittext
+            }
+
+            public void onFinish() {
+                bOTPResend.setText("Resend OTP");
+                bOTPResend.setEnabled(true);
+            }
+
+        }.start();
+    }
+
+    private void sendOTP() {
         PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
-                .setPhoneNumber("+91" + phone_number)
+                .setPhoneNumber(phone_number)
                 .setTimeout(60L, TimeUnit.SECONDS)
                 .setActivity(this)
                 .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
@@ -108,6 +149,9 @@ public class OtpActivity extends AppCompatActivity {
                         // The corresponding whitelisted code above should be used to complete sign-in.
 //                        enableUserManuallyInputCode();
                         Log.d(TAG, "onCodeSent:" + verificationId);
+                        mVerificationId = verificationId;
+                        mResendToken = forceResendingToken;
+                        countDownTimer();
                     }
 
                     @Override
@@ -125,6 +169,8 @@ public class OtpActivity extends AppCompatActivity {
                             // Invalid request
                         } else if (e instanceof FirebaseTooManyRequestsException) {
                             // The SMS quota for the project has been exceeded
+                            Log.e(TAG, "onVerificationFailed: ", e);
+                            Toast.makeText(OtpActivity.this, "Error: " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 })
@@ -133,8 +179,12 @@ public class OtpActivity extends AppCompatActivity {
     }
 
     private void verifyOtp(String otp) {
-        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verification_id, otp);
-        signInWithPhoneAuthCredential(credential);
+        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, otp);
+        try {
+            signInWithPhoneAuthCredential(credential);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
@@ -154,6 +204,8 @@ public class OtpActivity extends AppCompatActivity {
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                                 // The verification code entered was invalid
+                                Log.e(TAG, "onComplete: ", task.getException());
+                                Toast.makeText(OtpActivity.this, "Invalid OTP", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }

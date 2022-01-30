@@ -1,5 +1,7 @@
 package com.lahiriproductions.socialapp.fragments;
 
+import static com.lahiriproductions.socialapp.utils.Controller.sendNotification;
+
 import android.content.Context;
 import android.os.Bundle;
 
@@ -140,38 +142,6 @@ public class YoutubeFragment extends Fragment {
         rvYoutube.setLayoutManager(linearLayoutManager);
         rvYoutube.setAdapter(youtubeAdapter);
 
-        mDatabase.child("youtube_urls").addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                if (snapshot.exists()) {
-                    Youtube youtube = snapshot.getValue(Youtube.class);
-                    youtubeList.add(youtube);
-                    youtubeAdapter.notifyDataSetChanged();
-                }
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-
         bYoutubeSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -192,9 +162,57 @@ public class YoutubeFragment extends Fragment {
                     mDataMap.put("posted_on", System.currentTimeMillis());
                     mDatabase.child("youtube_urls").child(youtube_id).setValue(mDataMap);
                     etYoutubeUrl.setText("");
+                    sendNotification(mDatabase, currentUser.getUid(), "youtube");
                 }
             }
         });
 
+    }
+
+    private void fetchYoutubeVideos() {
+        youtubeList.clear();
+        mDatabase.child("youtube_urls").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                if (snapshot.exists()) {
+                    Youtube youtube = snapshot.getValue(Youtube.class);
+                    youtubeList.add(youtube);
+                    youtubeAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                String chat_key = snapshot.getKey();
+                for (Youtube youtube : youtubeList) {
+                    if (youtube.getYoutube_id().equals(chat_key)) {
+                        youtubeList.remove(youtube);
+                        youtubeAdapter.notifyDataSetChanged();
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        fetchYoutubeVideos();
     }
 }

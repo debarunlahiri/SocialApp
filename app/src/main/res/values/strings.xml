@@ -20,6 +20,8 @@
     <string name="usa">United States of America</string>
     <string name="new_zealand">New Zealand</string>
     <string name="india">India</string>
+    <string name="channel_name">channel name</string>
+    <string name="channel_description">channel description</string>
 
     <string-array name="radio_countries">
         <item>Select Country</item>

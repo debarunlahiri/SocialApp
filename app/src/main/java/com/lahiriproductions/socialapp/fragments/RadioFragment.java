@@ -1,8 +1,11 @@
 package com.lahiriproductions.socialapp.fragments;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.AudioRecord;
@@ -27,6 +30,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -81,7 +85,7 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
     private TextView tvRadioName;
     private CardView cvRadioArt;
     private ProgressBar pbRadio;
-    private LottieAnimationView animationView;
+    private LinearLayout llRadioPlaceHolder;
 
     private ArrayAdapter<String> radioCountriesArrayAdapter;
     private boolean prepared = false;
@@ -94,6 +98,7 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
     private int radio_image;
     private CircleLineVisualizer mVisualizer;
     private boolean isAlreadyPlayed = false;
+    private Context mContext;
 
     public RadioFragment() {
         // Required empty public constructor
@@ -137,6 +142,8 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mContext = getActivity();
+
         //get reference to visualizer
         actRadioCountries = view.findViewById(R.id.actRadioCountries);
         ivRadioArt = view.findViewById(R.id.ivRadioArt);
@@ -148,7 +155,7 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
         ibRadioQuit = view.findViewById(R.id.ibRadioQuit);
         cvRadioArt = view.findViewById(R.id.cvRadioArt);
         pbRadio = view.findViewById(R.id.pbRadio);
-        animationView = view.findViewById(R.id.animationView);
+        llRadioPlaceHolder = view.findViewById(R.id.llRadioPlaceHolder);
         mVisualizer = view.findViewById(R.id.blast);
 
         radioCountriesArrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.radio_countries));
@@ -166,9 +173,9 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
         actRadioCountries.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                radio_stream_position = 0;
-                isAlreadyPlayed = true;
                 if ((position == 0)) {
+                    radio_stream_position = 0;
+                    isAlreadyPlayed = true;
                     cvRadioArt.setVisibility(View.INVISIBLE);
                     tvRadioName.setVisibility(View.INVISIBLE);
                     mVisualizer.setVisibility(View.INVISIBLE);
@@ -176,17 +183,32 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
                         mediaPlayer.stop();
                         mediaPlayer = new MediaPlayer();
                     }
+                    llRadioPlaceHolder.setVisibility(View.VISIBLE);
                 } else if (position == 1) {
+                    radio_stream_position = 0;
+                    isAlreadyPlayed = true;
+                    ibRadioNext.setEnabled(true);
                     setupFijiRadio();
                     cvRadioArt.setVisibility(View.VISIBLE);
                     tvRadioName.setVisibility(View.VISIBLE);
                 } else if (position == 2) {
+                    radio_stream_position = 0;
+                    isAlreadyPlayed = true;
+                    ibRadioNext.setEnabled(true);
                     setupUSARadio();
                     cvRadioArt.setVisibility(View.VISIBLE);
                     tvRadioName.setVisibility(View.VISIBLE);
                 } else if (position == 3) {
+                    radio_stream_position = 0;
+                    isAlreadyPlayed = true;
+                    ibRadioNext.setEnabled(true);
                     setupNewZealandRadio();
+                    cvRadioArt.setVisibility(View.VISIBLE);
+                    tvRadioName.setVisibility(View.VISIBLE);
                 } else if (position == 4) {
+                    radio_stream_position = 0;
+                    isAlreadyPlayed = true;
+                    ibRadioNext.setEnabled(true);
                     setupIndiaRadio();
                     cvRadioArt.setVisibility(View.VISIBLE);
                     tvRadioName.setVisibility(View.VISIBLE);
@@ -199,12 +221,21 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
             public void onClick(View v) {
                 try {
                     radio_stream_position++;
-                    if (radio_stream_position < radioList.size()) {
+                    if (radio_stream_position < radioList.size() && !radioList.isEmpty()) {
                         radio_url = radioList.get(radio_stream_position).getRadio_stream_url();
                         radio_name = radioList.get(radio_stream_position).getRadio_name();
                         radio_image = radioList.get(radio_stream_position).getRadio_image();
                         isAudioTrackNeedsChange = true;
                         startRadio();
+                    }
+
+                    if (radio_stream_position >= radioList.size() - 1) {
+                        ibRadioNext.setEnabled(false);
+                        Toast.makeText(mContext, "There is only one station", Toast.LENGTH_SHORT).show();
+//                        ibRadioNext.setImageResource(R.drawable.grey_circle_bg);
+                    } else {
+                        ibRadioNext.setEnabled(true);
+//                        ibRadioNext.setImageResource(R.drawable.color_circle_bg);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -218,13 +249,24 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
             public void onClick(View v) {
                 try {
                     radio_stream_position--;
-                    if (radio_stream_position > 0) {
+                    if (radio_stream_position >= 0 && !radioList.isEmpty()) {
                         radio_url = radioList.get(radio_stream_position - 1).getRadio_stream_url();
                         radio_name = radioList.get(radio_stream_position - 1).getRadio_name();
                         radio_image = radioList.get(radio_stream_position - 1).getRadio_image();
                         isAudioTrackNeedsChange = true;
                         startRadio();
                         Log.d(TAG, "onClick: " + radio_name);
+                    }
+
+                    if (radio_stream_position <= 0) {
+                        ibRadioPrevious.setEnabled(false);
+                        Toast.makeText(mContext, "You have reached end", Toast.LENGTH_SHORT).show();
+//                        ibRadioPrevious.setImageResource(R.drawable.grey_circle_bg);
+
+                    } else {
+                        ibRadioPrevious.setEnabled(true);
+//                        ibRadioPrevious.setImageResource(R.drawable.color_circle_bg);
+
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -237,7 +279,7 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
             @Override
             public void onClick(View v) {
 //                requestStoragePermission();
-                if (!isAlreadyPlayed) {
+                if (!isAlreadyPlayed && !radioList.isEmpty()) {
                     radio_url = radioList.get(0).getRadio_stream_url();
                     radio_name = radioList.get(0).getRadio_name();
                     radio_image = radioList.get(0).getRadio_image();
@@ -245,13 +287,11 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
                 }
 
                 if (mediaPlayer.isPlaying()) {
-                    stopRadio();
+                    mediaPlayer.pause();
+                    Glide.with(getActivity()).load(R.drawable.ic_outline_play_arrow_24).into(ibRadioPlayPause);
                 } else {
-                    try {
-                        startRadio();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    mediaPlayer.start();
+                    Glide.with(getActivity()).load(R.drawable.ic_outline_pause_24).into(ibRadioPlayPause);
                 }
             }
         });
@@ -269,10 +309,11 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
 
     private void startRadio() throws IOException {
         try {
+            llRadioPlaceHolder.setVisibility(View.GONE);
+            stopRadio();
             Glide.with(getActivity()).load(radio_image).into(ivRadioArt);
             Glide.with(getActivity()).load(R.drawable.ic_outline_pause_24).into(ibRadioPlayPause);
             tvRadioName.setText(radio_name);
-            mediaPlayer.stop();
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mediaPlayer.setDataSource(radio_url);
@@ -311,12 +352,12 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
         }
 
 
-
     }
 
     private void stopRadio() {
         mediaPlayer.stop();
         mediaPlayer.reset();
+        mediaPlayer = null;
         Glide.with(getActivity()).load(R.drawable.ic_outline_play_arrow_24).into(ibRadioPlayPause);
 
     }
@@ -348,9 +389,9 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
         Glide.with(getActivity()).load(R.drawable.usa_wallpaper).into(ivRadioBg);
         radioList.clear();
         radioList.add(new Radio(Constants.Radio.USA.RADIO_NAME, Constants.Radio.USA.RADIO_LOGO_URL, Constants.Radio.USA.RADIO_STREAM_URL));
-        radioList.add(new Radio(Constants.Radio.USA.RADIO_NAME_2, Constants.Radio.USA.RADIO_LOGO_URL_2, Constants.Radio.USA.RADIO_STREAM_URL_2));
+//        radioList.add(new Radio(Constants.Radio.USA.RADIO_NAME_2, Constants.Radio.USA.RADIO_LOGO_URL_2, Constants.Radio.USA.RADIO_STREAM_URL_2));
         radioList.add(new Radio(Constants.Radio.USA.RADIO_NAME_3, Constants.Radio.USA.RADIO_LOGO_URL_3, Constants.Radio.USA.RADIO_STREAM_URL_3));
-        radioList.add(new Radio(Constants.Radio.USA.RADIO_NAME_4, Constants.Radio.USA.RADIO_LOGO_URL_4, Constants.Radio.USA.RADIO_STREAM_URL_4));
+//        radioList.add(new Radio(Constants.Radio.USA.RADIO_NAME_4, Constants.Radio.USA.RADIO_LOGO_URL_4, Constants.Radio.USA.RADIO_STREAM_URL_4));
 //        radioList.add(new Radio(Constants.Radio.USA.RADIO_NAME_5, Constants.Radio.USA.RADIO_STREAM_URL_5));
         startPlayingRadio();
     }

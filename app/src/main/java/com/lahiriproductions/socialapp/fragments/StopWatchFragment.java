@@ -67,7 +67,8 @@ public class StopWatchFragment extends Fragment {
     private StopWatchLapAdapter stopWatchLapAdapter;
     private List<StopWatchLap> stopWatchLapList = new ArrayList<>();
 
-    private ImageButton ibPlayPause, ibReset, ibPause;
+    private ImageButton ibPause;
+    private Button ibPlayPause, ibReset;
     private Button bSetLap, bSoundRecordings;
     private boolean isPaused = false;
     private boolean isStarted = false;
@@ -147,23 +148,22 @@ public class StopWatchFragment extends Fragment {
 
         tvSelectedAudioName.setVisibility(View.GONE);
 
-        if (sharedPreferences.contains(Constants.SELECTED_AUDIO_PATH)) {
-            selectedAudioPath = sharedPreferences.getString(Constants.SELECTED_AUDIO_PATH, "");
-            tvSelectedAudioName.setText("Selected Audio - " + selectedAudioPath.substring(selectedAudioPath.lastIndexOf("/")+1));
-            mediaPlayer = MediaPlayer.create(mContext, Uri.parse(selectedAudioPath));
-        }
 
 
+        ibPlayPause.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_outline_play_arrow_24, 0, 0, 0);
+        ibPlayPause.setText("Start");
         ibPlayPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
                     if (stopwatch.isStarted() && !stopwatch.isPaused()) {
                         stopwatch.pause();
-                        ibPlayPause.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_outline_play_arrow_24));
+                        ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_play_arrow_24, 0, 0, 0);
+                        ibPlayPause.setText("Resume");
                     } else if (stopwatch.isPaused()) {
                         stopwatch.resume();
-                        ibPlayPause.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_outline_pause_24));
+                        ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_pause_24, 0, 0, 0);
+                        ibPlayPause.setText("Pause");
                     } else {
                         if (selectedAudioPath != null) {
                             tvSelectedAudioName.setVisibility(View.VISIBLE);
@@ -171,7 +171,8 @@ public class StopWatchFragment extends Fragment {
                             tvSelectedAudioName.setVisibility(View.GONE);
                         }
                         stopwatch.start();
-                        ibPlayPause.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_outline_pause_24));
+                        ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_pause_24, 0, 0, 0);
+                        ibPlayPause.setText("Pause");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -185,49 +186,67 @@ public class StopWatchFragment extends Fragment {
         ibPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isPaused = true;
-                stopwatch.pause();
-                stopwatch.setTextView(tvStopWatch);
-                ibPlayPause.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_outline_play_arrow_24));
+                try {
+                    isPaused = true;
+                    stopwatch.pause();
+                    stopwatch.setTextView(tvStopWatch);
+                    ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_play_arrow_24, 0, 0, 0);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
 
         ibReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isReset = true;
-                tvStopWatch.setText("0.00s");
-                stopwatch.stop();
-                stopWatchLapList.clear();
-                stopWatchLapAdapter.notifyDataSetChanged();
-                ibPlayPause.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_outline_play_arrow_24));
+                try {
+                    isReset = true;
+                    tvStopWatch.setText("0.00s");
+                    if (stopwatch.isStarted()) {
+                        stopwatch.stop();
+                    }
+                    stopWatchLapList.clear();
+                    stopWatchLapAdapter.notifyDataSetChanged();
+                    ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_play_arrow_24, 0, 0, 0);
+                    ibPlayPause.setText("Start");
+                    lapMilLi = 0;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
         });
 
         stopwatch.setOnTickListener(new Stopwatch.OnTickListener() {
             @Override
             public void onTick(Stopwatch stopwatch) {
-                if (lapMilLi != 0 && stopwatch.getElapsedTime() >= lapMilLi) {
-                    stopWatchLapList.add(new StopWatchLap(stopwatch.getElapsedTime()));
-                    stopWatchLapAdapter.setStopWatchLapList(stopWatchLapList);
-                    stopwatch.stop();
-                    stopwatch.start();
-                    if (selectedAudioPath != null) {
-                        mediaPlayer.start();
-                        Log.e(TAG, "onTick: " + (mediaPlayer.getDuration()));
-                        if (mediaPlayer.getDuration() > lapMilLi) {
-                            if (!isDurationMessageShown) {
-                                new MaterialDialog.Builder(getActivity())
-                                        .title("Info")
-                                        .content("Your audio duration is greater than your lap time. Your sound may get overlap with other lap times.")
-                                        .positiveText("Okay")
-                                        .show();
-                                isDurationMessageShown = true;
-                            }
+                try {
+                    if (lapMilLi != 0 && stopwatch.getElapsedTime() >= lapMilLi) {
+                        stopWatchLapList.add(new StopWatchLap(stopwatch.getElapsedTime()));
+                        stopWatchLapAdapter.setStopWatchLapList(stopWatchLapList);
+                        stopwatch.stop();
+                        stopwatch.start();
+                        if (selectedAudioPath != null) {
+                            mediaPlayer.start();
+                            Log.e(TAG, "onTick: " + (mediaPlayer.getDuration()));
+                            if (mediaPlayer.getDuration() > lapMilLi) {
+                                if (!isDurationMessageShown) {
+                                    new MaterialDialog.Builder(getActivity())
+                                            .title("Info")
+                                            .content("Your audio duration is greater than your lap time. Your sound may get overlap with other lap times.")
+                                            .positiveText("Okay")
+                                            .show();
+                                    isDurationMessageShown = true;
+                                }
 
+                            }
                         }
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+
             }
         });
 
@@ -239,7 +258,6 @@ public class StopWatchFragment extends Fragment {
                     stopwatch.stop();
                     stopwatch.start();
                     Log.e(TAG, "lapMilLi: " + String.format("%d", lapMilLi));
-                    ibPlayPause.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_outline_pause_24));
                 } else {
                     Toast.makeText(mContext, "Cannot set lap time when stop watch is paused", Toast.LENGTH_SHORT).show();
                 }
@@ -265,6 +283,11 @@ public class StopWatchFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        if (sharedPreferences.contains(Constants.SELECTED_AUDIO_PATH)) {
+            selectedAudioPath = sharedPreferences.getString(Constants.SELECTED_AUDIO_PATH, "");
+            tvSelectedAudioName.setText("Selected Audio - " + selectedAudioPath.substring(selectedAudioPath.lastIndexOf("/")+1));
+            mediaPlayer = MediaPlayer.create(mContext, Uri.parse(selectedAudioPath));
+        }
         mContext.registerReceiver(br, new IntentFilter(MyBroadcastService.COUNTDOWN_BR));
         Log.i(TAG, "Registered broacast receiver");
     }

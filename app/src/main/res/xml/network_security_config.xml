@@ -15,5 +15,7 @@
         <domain includeSubdomains="true">fijiradio.net</domain>
         <domain includeSubdomains="true">fijivillage.com</domain>
         <domain includeSubdomains="true">voscast.com</domain>
+        <domain includeSubdomains="true">www.expertfiling.in</domain>
+        <domain includeSubdomains="true">expertfiling.in</domain>
     </domain-config>
 </network-security-config>

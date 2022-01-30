@@ -1,15 +1,15 @@
 package com.lahiriproductions.socialapp.utils;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.webkit.MimeTypeMap;
 
+import com.google.firebase.database.DatabaseReference;
 import com.lahiriproductions.socialapp.activities.LoginActivity;
-import com.lahiriproductions.socialapp.activities.MainActivity;
 
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -55,5 +55,14 @@ public class Controller {
         Intent loginIntent = new Intent(mActivity, LoginActivity.class);
         mActivity.startActivity(loginIntent);
         mActivity.finishAffinity();
+    }
+
+    public static void sendNotification(DatabaseReference mDatabase, String uid, String type) {
+        HashMap<String, Object> mDataMap = new HashMap<>();
+        mDataMap.put("sender_user_id", uid);
+        mDataMap.put("message", "User has sent a message");
+        mDataMap.put("type", type);
+        mDataMap.put("timestamp", System.currentTimeMillis());
+        mDatabase.child("notifications").setValue(mDataMap);
     }
 }
