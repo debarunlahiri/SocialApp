@@ -12,9 +12,14 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,10 +38,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.lahiriproductions.socialapp.R;
 import com.lahiriproductions.socialapp.adapter.BottomViewPagerAdapter;
+import com.lahiriproductions.socialapp.utils.Constants;
 import com.lahiriproductions.socialapp.utils.Controller;
 import com.lahiriproductions.socialapp.utils.MyBroadcastService;
 import com.lahiriproductions.socialapp.utils.NonSwipeableViewPager;
 import com.lahiriproductions.socialapp.utils.NotificationEventReceiver;
+import com.lahiriproductions.socialapp.utils.Variables;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -57,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseStorage mStorage;
     private StorageReference storageReference;
     private Context mContext;
+    private Uri ringtone;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +74,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mContext = MainActivity.this;
+
+        sharedPreferences = getSharedPreferences(Constants.SELECTED_RINGTONE, Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
 
         tbMain = findViewById(R.id.tbMain);
         tbMain.setTitleTextColor(Color.WHITE);
@@ -113,30 +126,30 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.stop_watch_menu_home_list_item:
-                        tbMain.setTitle("Stop Watch");
+                        tbMain.setTitle("Taki Tym");
                         vpMain.setCurrentItem(0, false);
                         return true;
 
                     case R.id.youtube_menu_home_list_item:
-                        tbMain.setTitle("Youtube");
+                        tbMain.setTitle("Kani-Kani Videos");
                         vpMain.setCurrentItem(1, false);
                         return true;
 
 
                     case R.id.radio_menu_home_list_item:
-                        tbMain.setTitle("Radio");
+                        tbMain.setTitle("Talanoa Radio");
                         vpMain.setCurrentItem(2, false);
                         return true;
 
 
                     case R.id.group_chat_menu_home_list_item:
-                        tbMain.setTitle("Group Chat");
+                        tbMain.setTitle("Taki Music");
                         vpMain.setCurrentItem(3, false);
                         return true;
 
 
                     case R.id.events_menu_home_list_item:
-                        tbMain.setTitle("Events");
+                        tbMain.setTitle("Magiti Events");
                         vpMain.setCurrentItem(4, false);
                         return true;
 
@@ -187,6 +200,22 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        vpMain.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                invalidateOptionsMenu();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
 
@@ -194,13 +223,53 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+//        if (vpMain.getCurrentItem() == 1) {
+//            menu.findItem(R.id.baby_mix_stop_menu_list_item).setVisible(true);
+//            menu.findItem(R.id.tabu_mix_stop_menu_list_item).setVisible(true);
+//            menu.findItem(R.id.qito_mix_stop_menu_list_item).setVisible(true);
+//            menu.findItem(R.id.kece_mix_stop_menu_list_item).setVisible(true);
+//        } else {
+//            menu.findItem(R.id.baby_mix_stop_menu_list_item).setVisible(false);
+//            menu.findItem(R.id.tabu_mix_stop_menu_list_item).setVisible(false);
+//            menu.findItem(R.id.qito_mix_stop_menu_list_item).setVisible(false);
+//            menu.findItem(R.id.kece_mix_stop_menu_list_item).setVisible(false);
+//        }
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Intent soundRecordingIntent = new Intent(MainActivity.this, SoundRecordingsActivity.class);
         switch (item.getItemId()) {
-            case R.id.edit_profile_menu_home_list_item:
+            case R.id.baby_mix_stop_menu_list_item:
+                Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_RINGTONE);
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
+                startActivityForResult(intent, 5);
+                Variables.isRingtoneOn = false;
+                return true;
+
+            case R.id.tabu_mix_stop_menu_list_item:
+                soundRecordingIntent.putExtra("list_type", "tabu_mix");
+                startActivity(soundRecordingIntent);
+                Variables.isRingtoneOn = false;
+                return true;
+
+            case R.id.qito_mix_stop_menu_list_item:
+                soundRecordingIntent.putExtra("list_type", "qito_mix");
+                startActivity(soundRecordingIntent);
+                Variables.isRingtoneOn = false;
+                return true;
+
+            case R.id.kece_mix_stop_menu_list_item:
+//                soundRecordingIntent.putExtra("list_type", "kece_mix");
+//                startActivity(soundRecordingIntent);
+                Variables.isRingtoneOn = true;
+                Toast.makeText(mContext, "Random ringtone enabled", Toast.LENGTH_SHORT).show();
+                return true;
+
+            case R.id.edit_profile_stop_menu_list_item:
                 Intent profileIntent = new Intent(MainActivity.this, ProfileActivity.class);
                 profileIntent.putExtra("isEdit", true);
                 startActivity(profileIntent);
@@ -208,6 +277,25 @@ public class MainActivity extends AppCompatActivity {
 
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case 5:
+                    ringtone = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+                    editor.putString(Constants.SELECTED_RINGTONE, String.valueOf(ringtone));
+                    editor.apply();
+                    // Toast.makeText(getBaseContext(),RingtoneManager.URI_COLUMN_INDEX,
+                    // Toast.LENGTH_SHORT).show();
+                    break;
+
+                default:
+                    break;
+            }
         }
     }
 

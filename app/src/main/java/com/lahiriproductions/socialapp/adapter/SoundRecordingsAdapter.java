@@ -32,6 +32,7 @@ import com.lahiriproductions.socialapp.R;
 import com.lahiriproductions.socialapp.activities.SoundRecordingsActivity;
 import com.lahiriproductions.socialapp.models.SoundRecordings;
 import com.lahiriproductions.socialapp.utils.Constants;
+import com.lahiriproductions.socialapp.utils.Controller;
 import com.lahiriproductions.socialapp.utils.FileUtil;
 
 import java.io.BufferedInputStream;
@@ -81,6 +82,7 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
         holder.tvSoundFileName.setText(soundRecordings.getAbsolutePath().substring(soundRecordings.getAbsolutePath().lastIndexOf("/")+1));
         holder.tvSoundFileFormat.setText("MP3 File");
         mediaPlayer = MediaPlayer.create(mContext, Uri.parse(soundRecordings.getAbsolutePath()));
+        Controller.mediaPlayerRecordings = mediaPlayer;
         if (position == playingPosition) {
             playingHolder = holder;
             // this view holder corresponds to the currently playing audio cell

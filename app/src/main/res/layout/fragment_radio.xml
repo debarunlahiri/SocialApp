@@ -221,4 +221,14 @@
         app:layout_constraintBottom_toBottomOf="@+id/ibRadioPlayPause"
         app:layout_constraintEnd_toEndOf="@+id/ibRadioPlayPause"
         app:layout_constraintTop_toTopOf="@+id/ibRadioPlayPause" />
+
+    <com.google.android.exoplayer2.ui.PlayerView
+        android:id="@+id/idExoPlayerVIew"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/view2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,6 +1,7 @@
 package com.lahiriproductions.socialapp.AppInterface;
 
 import com.google.protobuf.Api;
+import com.lahiriproductions.socialapp.models.QitoRingtone;
 import com.lahiriproductions.socialapp.models.SendNotification;
 
 import java.util.Map;
@@ -21,6 +22,10 @@ public interface ApiCalls {
     @Headers("Content-Type: application/json")
     @GET(ApiInterface.API_GET_EVENTS)
     Call<com.lahiriproductions.socialapp.events.Events> getEvents();
+
+    @Headers("Content-Type: application/json")
+    @GET(ApiInterface.API_GET_RINGTONE)
+    Call<QitoRingtone> getRingtones();
 
     @POST(ApiInterface.API_INSERT_NOTIFICATION)
     @FormUrlEncoded

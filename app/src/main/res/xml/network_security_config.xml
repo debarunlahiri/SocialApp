@@ -17,5 +17,13 @@
         <domain includeSubdomains="true">voscast.com</domain>
         <domain includeSubdomains="true">www.expertfiling.in</domain>
         <domain includeSubdomains="true">expertfiling.in</domain>
+
+        <domain includeSubdomains="true">broadcast.co.nz</domain>
+        <domain includeSubdomains="true">myradiostream.com</domain>
+        <domain includeSubdomains="true">fastcast4u.com</domain>
+        <domain includeSubdomains="true">streamtheworld.com</domain>
+        <domain includeSubdomains="true">wnyc.org</domain>
+        <domain includeSubdomains="true">wostreaming.net</domain>
+        <domain includeSubdomains="true">streamon.fm</domain>
     </domain-config>
 </network-security-config>

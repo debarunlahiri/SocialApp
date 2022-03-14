@@ -99,7 +99,7 @@ public class MyService extends Service {
 
             builder.setWhen(System.currentTimeMillis());
             builder.setSmallIcon(R.mipmap.ic_launcher);
-            Bitmap largeIconBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_background);
+            Bitmap largeIconBitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_foreground);
             builder.setLargeIcon(largeIconBitmap);
             // Make the notification max priority.
             builder.setPriority(Notification.PRIORITY_MAX);
@@ -135,7 +135,7 @@ public class MyService extends Service {
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addNextIntentWithParentStack(resultIntent);
         PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         NotificationChannel chan = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT);
         chan.setLightColor(Color.BLUE);
@@ -146,7 +146,7 @@ public class MyService extends Service {
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, channelId);
         Notification notification = notificationBuilder.setOngoing(true)
-                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setSmallIcon(R.mipmap.ic_launcher_foreground)
                 .setContentTitle("App is running in background")
                 .setPriority(NotificationManager.IMPORTANCE_MIN)
                 .setCategory(Notification.CATEGORY_SERVICE)

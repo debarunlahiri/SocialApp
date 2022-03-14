@@ -2,6 +2,8 @@ package com.lahiriproductions.socialapp.utils;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.media.MediaPlayer;
+import android.media.Ringtone;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.webkit.MimeTypeMap;
@@ -17,6 +19,8 @@ import java.util.regex.Pattern;
 public class Controller {
 
     public static Activity mainActivity;
+    public static Ringtone ringtone;
+    public static MediaPlayer mediaPlayerRecordings;
 
     public static String millisecondsToTime(long milliseconds) {
         return String.format("%02d:%02d:%02d",

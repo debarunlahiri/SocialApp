@@ -56,13 +56,13 @@ public class NotificationEventReceiver extends WakefulBroadcastReceiver {
     private static PendingIntent getStartPendingIntent(Context context) {
         Intent intent = new Intent(context, NotificationEventReceiver.class);
         intent.setAction(ACTION_START_NOTIFICATION_SERVICE);
-        return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_IMMUTABLE);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     public static PendingIntent getDeleteIntent(Context context) {
         Intent intent = new Intent(context, NotificationEventReceiver.class);
         intent.setAction(ACTION_DELETE_NOTIFICATION);
-        return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_IMMUTABLE);
     }
 }

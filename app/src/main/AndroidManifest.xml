@@ -24,13 +24,20 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />
+
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
+        android:grantUriPermissions="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:networkSecurityConfig="@xml/network_security_config"
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -70,17 +77,73 @@
         <activity
             android:name=".activities.MainActivity"
             android:exported="true"></activity>
+
         <service
             android:name=".utils.NotificationIntentService"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="true" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
         <receiver android:name=".utils.NotificationEventReceiver" />
-        <receiver android:name=".utils.NotificationServiceStarterReceiver"
+        <receiver
+            android:name=".utils.NotificationServiceStarterReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
                 <action android:name="android.intent.action.TIME_SET" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".music_services.PlayMusicService" />
+
+        <receiver android:name=".broadcast_receiver.NotificationBroadcast"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.MUSIC.delete" />
+                <action android:name="com.MUSIC.pause" />
+                <action android:name="com.MUSIC.next" />
+                <action android:name="com.MUSIC.play" />
+                <action android:name="com.MUSIC.previous" />
+                <action android:name="com.MUSIC.audioplayer" />
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".broadcast_receiver.AlarmReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_SLEEP_TIMER" />
+            </intent-filter>
+        </receiver>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
+        <service
+            android:name="dm.audiostreamer.AudioStreamingService"
+            android:enabled="true"
+            android:exported="true" />
+        <receiver android:name="dm.audiostreamer.AudioStreamingReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="dm.audiostreamer.close" />
+                <action android:name="dm.audiostreamer.pause" />
+                <action android:name="dm.audiostreamer.next" />
+                <action android:name="dm.audiostreamer.play" />
+                <action android:name="dm.audiostreamer.previous" />
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+                <action android:name="android.media.AUDIO_BECOMING_NOISY" />
             </intent-filter>
         </receiver>
     </application>

@@ -1,11 +1,15 @@
 package com.lahiriproductions.socialapp.fragments;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -16,6 +20,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,10 +37,12 @@ import com.lahiriproductions.socialapp.adapter.StopWatchLapAdapter;
 import com.lahiriproductions.socialapp.models.StopWatchLap;
 import com.lahiriproductions.socialapp.utils.Constants;
 import com.lahiriproductions.socialapp.utils.MyBroadcastService;
+import com.lahiriproductions.socialapp.utils.Variables;
 import com.yashovardhan99.timeit.Stopwatch;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 
 /**
@@ -75,10 +82,18 @@ public class StopWatchFragment extends Fragment {
     private boolean isReset = false;
 
     private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences2;
     private SharedPreferences.Editor editor;
     private String selectedAudioPath;
-    private MediaPlayer mediaPlayer;
+    private MediaPlayer mediaPlayer, randomMP;
     private boolean isDurationMessageShown = false;
+    private boolean isSelectedAudio = false;
+    private Ringtone ringtone;
+    private Uri ringtoneUri;
+    private String selectedAudioPath2;
+
+    List<Integer> soundList = new ArrayList<Integer>();
+
 
 
     public StopWatchFragment() {
@@ -126,6 +141,7 @@ public class StopWatchFragment extends Fragment {
         mContext = getActivity();
 
         sharedPreferences = mContext.getSharedPreferences(Constants.SELECTED_AUDIO, Context.MODE_PRIVATE);
+        sharedPreferences2 = mContext.getSharedPreferences(Constants.SELECTED_RINGTONE, Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
 
         tvStopWatch = view.findViewById(R.id.tvStopWatch);
@@ -148,7 +164,12 @@ public class StopWatchFragment extends Fragment {
 
         tvSelectedAudioName.setVisibility(View.GONE);
 
-
+        soundList.add(R.raw.ringtone1);
+        soundList.add(R.raw.ringtone2);
+        soundList.add(R.raw.ringtone3);
+        soundList.add(R.raw.ringtone4);
+        soundList.add(R.raw.ringtone5);
+        soundList.add(R.raw.ringtone6);
 
         ibPlayPause.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_outline_play_arrow_24, 0, 0, 0);
         ibPlayPause.setText("Start");
@@ -191,6 +212,25 @@ public class StopWatchFragment extends Fragment {
                     stopwatch.pause();
                     stopwatch.setTextView(tvStopWatch);
                     ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_play_arrow_24, 0, 0, 0);
+                    if (selectedAudioPath != null) {
+                        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                            mediaPlayer.stop();
+                        }
+                    } else {
+                        if (randomMP != null && randomMP.isPlaying()) {
+                            randomMP.stop();
+                            randomMP = null;
+                        }
+                        if (ringtone != null && ringtone.isPlaying()) {
+                            ringtone.stop();
+                        }
+                        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                            mediaPlayer.stop();
+                        }
+                    }
+                    if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                        mediaPlayer.stop();
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -205,6 +245,15 @@ public class StopWatchFragment extends Fragment {
                     tvStopWatch.setText("0.00s");
                     if (stopwatch.isStarted()) {
                         stopwatch.stop();
+                    }
+                    if (randomMP != null && randomMP.isPlaying()) {
+                        randomMP.stop();
+                    }
+                    if (ringtone != null && ringtone.isPlaying()) {
+                        ringtone.stop();
+                    }
+                    if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                        mediaPlayer.stop();
                     }
                     stopWatchLapList.clear();
                     stopWatchLapAdapter.notifyDataSetChanged();
@@ -227,21 +276,39 @@ public class StopWatchFragment extends Fragment {
                         stopWatchLapAdapter.setStopWatchLapList(stopWatchLapList);
                         stopwatch.stop();
                         stopwatch.start();
-                        if (selectedAudioPath != null) {
-                            mediaPlayer.start();
-                            Log.e(TAG, "onTick: " + (mediaPlayer.getDuration()));
-                            if (mediaPlayer.getDuration() > lapMilLi) {
-                                if (!isDurationMessageShown) {
-                                    new MaterialDialog.Builder(getActivity())
-                                            .title("Info")
-                                            .content("Your audio duration is greater than your lap time. Your sound may get overlap with other lap times.")
-                                            .positiveText("Okay")
-                                            .show();
-                                    isDurationMessageShown = true;
-                                }
+                        if (Variables.isRingtoneOn) {
+                            if (randomMP != null && randomMP.isPlaying()) {
+                                randomMP.stop();
+                            }
+                            playRandomSound();
+                        } else {
+                            if (selectedAudioPath != null) {
+                                mediaPlayer.start();
+                                Log.e(TAG, "onTick: " + (mediaPlayer.getDuration()));
+                                if (mediaPlayer.getDuration() > lapMilLi) {
+                                    if (!isDurationMessageShown) {
+                                        new MaterialDialog.Builder(getActivity())
+                                                .title("Info")
+                                                .content("Your audio duration is greater than your lap time. Your sound may get overlap with other lap times.")
+                                                .positiveText("Okay")
+                                                .show();
+                                        isDurationMessageShown = true;
+                                    }
 
+                                }
+                            } else {
+//                                try {
+//                                    if (ringtoneUri != null) {
+//                                        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+//                                        ringtone = RingtoneManager.getRingtone(mContext, notification);
+//                                    }
+//                                    ringtone.play();
+//                                } catch (Exception e) {
+//                                    e.printStackTrace();
+//                                }
                             }
                         }
+
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -280,6 +347,13 @@ public class StopWatchFragment extends Fragment {
         }
     };
 
+    private void playRandomSound() {
+        int randomInt = (new Random().nextInt(soundList.size()));
+        int sound = soundList.get(randomInt);
+        randomMP = MediaPlayer.create(getActivity(), sound);
+        randomMP.start();
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -287,6 +361,12 @@ public class StopWatchFragment extends Fragment {
             selectedAudioPath = sharedPreferences.getString(Constants.SELECTED_AUDIO_PATH, "");
             tvSelectedAudioName.setText("Selected Audio - " + selectedAudioPath.substring(selectedAudioPath.lastIndexOf("/")+1));
             mediaPlayer = MediaPlayer.create(mContext, Uri.parse(selectedAudioPath));
+            isSelectedAudio = true;
+        } else if (sharedPreferences2.contains(Constants.SELECTED_RINGTONE)) {
+            selectedAudioPath2 = sharedPreferences.getString(Constants.SELECTED_RINGTONE, "");
+            ringtoneUri = Uri.parse(selectedAudioPath2);
+            ringtone = RingtoneManager.getRingtone(mContext, ringtoneUri);
+            isSelectedAudio = false;
         }
         mContext.registerReceiver(br, new IntentFilter(MyBroadcastService.COUNTDOWN_BR));
         Log.i(TAG, "Registered broacast receiver");

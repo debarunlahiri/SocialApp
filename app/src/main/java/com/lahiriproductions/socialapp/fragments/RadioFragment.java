@@ -1,26 +1,17 @@
 package com.lahiriproductions.socialapp.fragments;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.graphics.Bitmap;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
-import android.media.AudioManager;
-import android.media.AudioRecord;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import android.provider.Settings;
+import android.os.Handler;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,39 +23,40 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.airbnb.lottie.LottieAnimationView;
 import com.bumptech.glide.Glide;
-import com.cleveroad.audiovisualization.AudioVisualization;
-import com.cleveroad.audiovisualization.GLAudioVisualizationView;
-import com.gauravk.audiovisualizer.visualizer.BlastVisualizer;
 import com.gauravk.audiovisualizer.visualizer.CircleLineVisualizer;
-import com.google.android.material.snackbar.Snackbar;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.MultiplePermissionsReport;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.RenderersFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.ProgressiveMediaSource;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
+import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.lahiriproductions.socialapp.R;
 import com.lahiriproductions.socialapp.models.Radio;
 import com.lahiriproductions.socialapp.utils.Constants;
-import com.rosemaryapp.amazingspinner.AmazingSpinner;
-import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+
+import dm.audiostreamer.AudioStreamingManager;
+import dm.audiostreamer.CurrentSessionCallback;
+import dm.audiostreamer.MediaMetaData;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link RadioFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedListener {
+public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedListener, CurrentSessionCallback {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -99,6 +91,12 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
     private CircleLineVisualizer mVisualizer;
     private boolean isAlreadyPlayed = false;
     private Context mContext;
+    private AudioStreamingManager streamingManager;
+    // creating a variable for exoplayerview.
+    PlayerView exoPlayerView;
+
+    // creating a variable for exoplayer
+    SimpleExoPlayer exoPlayer;
 
     public RadioFragment() {
         // Required empty public constructor
@@ -157,6 +155,10 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
         pbRadio = view.findViewById(R.id.pbRadio);
         llRadioPlaceHolder = view.findViewById(R.id.llRadioPlaceHolder);
         mVisualizer = view.findViewById(R.id.blast);
+        exoPlayerView = view.findViewById(R.id.idExoPlayerVIew);
+
+
+        streamingManager = AudioStreamingManager.getInstance(mContext);
 
         radioCountriesArrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.radio_countries));
         radioCountriesArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -231,7 +233,7 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
 
                     if (radio_stream_position >= radioList.size() - 1) {
                         ibRadioNext.setEnabled(false);
-                        Toast.makeText(mContext, "There is only one station", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(mContext, "There is only one station", Toast.LENGTH_SHORT).show();
 //                        ibRadioNext.setImageResource(R.drawable.grey_circle_bg);
                     } else {
                         ibRadioNext.setEnabled(true);
@@ -257,7 +259,6 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
                         startRadio();
                         Log.d(TAG, "onClick: " + radio_name);
                     }
-
                     if (radio_stream_position <= 0) {
                         ibRadioPrevious.setEnabled(false);
                         Toast.makeText(mContext, "You have reached end", Toast.LENGTH_SHORT).show();
@@ -286,13 +287,43 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
                     isAlreadyPlayed = true;
                 }
 
-                if (mediaPlayer.isPlaying()) {
-                    mediaPlayer.pause();
-                    Glide.with(getActivity()).load(R.drawable.ic_outline_play_arrow_24).into(ibRadioPlayPause);
-                } else {
-                    mediaPlayer.start();
-                    Glide.with(getActivity()).load(R.drawable.ic_outline_pause_24).into(ibRadioPlayPause);
+//                if (streamingManager.isPlaying()) {
+//                    streamingManager.onStop();
+//                    Glide.with(getActivity()).load(R.drawable.ic_outline_play_arrow_24).into(ibRadioPlayPause);
+//                } else {
+//                    MediaMetaData obj = new MediaMetaData();
+//                    obj.setMediaId(String.valueOf(0));
+//                    obj.setMediaUrl(radio_url);
+//                    if (streamingManager.isPlaying()) {
+//                        streamingManager.onStop();
+//                        streamingManager.onPlay(obj);
+//                    } else {
+//                        streamingManager.onPlay(obj);
+//                    }
+//                    Glide.with(getActivity()).load(R.drawable.ic_outline_pause_24).into(ibRadioPlayPause);
+//                }
+
+                if (exoPlayer != null) {
+                    if (exoPlayer.isPlaying()) {
+                        exoPlayer.stop();
+                        Glide.with(getActivity()).load(R.drawable.ic_outline_play_arrow_24).into(ibRadioPlayPause);
+                    } else {
+                        try {
+                            startRadio();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        Glide.with(getActivity()).load(R.drawable.ic_outline_pause_24).into(ibRadioPlayPause);
+                    }
                 }
+
+//                if (mediaPlayer.isPlaying()) {
+//                    mediaPlayer.pause();
+//                    Glide.with(getActivity()).load(R.drawable.ic_outline_play_arrow_24).into(ibRadioPlayPause);
+//                } else {
+//                    mediaPlayer.start();
+//                    Glide.with(getActivity()).load(R.drawable.ic_outline_pause_24).into(ibRadioPlayPause);
+//                }
             }
         });
 
@@ -300,8 +331,9 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
             @Override
             public void onClick(View v) {
                 Toast.makeText(getActivity(), "Radio has been stopped", Toast.LENGTH_SHORT).show();
-                mediaPlayer.stop();
-                mediaPlayer.reset();
+//                mediaPlayer.stop();
+//                mediaPlayer.reset();
+                streamingManager.onStop();
                 Glide.with(getActivity()).load(R.drawable.ic_outline_play_arrow_24).into(ibRadioPlayPause);
             }
         });
@@ -309,44 +341,104 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
 
     private void startRadio() throws IOException {
         try {
+            if (exoPlayer != null) {
+                exoPlayer.stop();
+                exoPlayer = null;
+                Uri videoUri = Uri.parse(radio_url);
+
+                exoPlayer = new SimpleExoPlayer.Builder(getActivity()).build();
+//                exoPlayerView.setPlayer(exoPlayer);
+
+                MediaItem mediaItem = MediaItem.fromUri(videoUri);
+                exoPlayer.clearMediaItems();
+                exoPlayer.setMediaItem(mediaItem);
+                exoPlayer.prepare();
+                exoPlayer.setPlayWhenReady(true);
+            } else {
+                Uri videoUri = Uri.parse(radio_url);
+
+                exoPlayer = new SimpleExoPlayer.Builder(getActivity()).build();
+//                exoPlayerView.setPlayer(exoPlayer);
+
+                MediaItem mediaItem = MediaItem.fromUri(videoUri);
+                exoPlayer.clearMediaItems();
+                exoPlayer.setMediaItem(mediaItem);
+                exoPlayer.prepare();
+                exoPlayer.setPlayWhenReady(true);
+            }
+
+            exoPlayer.addListener(new Player.Listener() {
+                @Override
+                public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+                    if (playbackState == Player.STATE_BUFFERING) {
+                        pbRadio.setVisibility(View.VISIBLE);
+                    } else {
+                        pbRadio.setVisibility(View.GONE);
+                    }
+                    Player.Listener.super.onPlayerStateChanged(playWhenReady, playbackState);
+                }
+            });
+
+        } catch (Exception e) {
+            // below line is used for
+            // handling our errors.
+            Log.e("TAG", "Error : " + e.toString());
+        }
+        try {
+//            MediaMetaData obj = new MediaMetaData();
+//            obj.setMediaId(String.valueOf(0));
+//            obj.setMediaUrl(radio_url);
+//            if (streamingManager != null) {
+//                streamingManager.onStop();
+//                streamingManager.cleanupPlayer(true, true);
+//            }
+//            streamingManager = null;
+//            streamingManager = AudioStreamingManager.getInstance(mContext);
+//            streamingManager.onPlay(obj);
+
+
+
+
+
             llRadioPlaceHolder.setVisibility(View.GONE);
-            stopRadio();
+//            stopRadio();
             Glide.with(getActivity()).load(radio_image).into(ivRadioArt);
             Glide.with(getActivity()).load(R.drawable.ic_outline_pause_24).into(ibRadioPlayPause);
             tvRadioName.setText(radio_name);
-            mediaPlayer = new MediaPlayer();
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mediaPlayer.setDataSource(radio_url);
-            mediaPlayer.prepareAsync();
-            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    mp.start();
-
-                    if (mp.isPlaying()) {
-                        pbRadio.setVisibility(View.GONE);
-                    } else {
-                        pbRadio.setVisibility(View.VISIBLE);
-                    }
-
-                    mp.setOnInfoListener(new MediaPlayer.OnInfoListener() {
-
-                        @Override
-                        public boolean onInfo(MediaPlayer mp, int what, int extra) {
-                            switch (what) {
-                                case MediaPlayer.MEDIA_INFO_BUFFERING_START:
-                                    pbRadio.setVisibility(View.VISIBLE);
-                                    break;
-                                case MediaPlayer.MEDIA_INFO_BUFFERING_END:
-                                    pbRadio.setVisibility(View.GONE);
-                                    break;
-
-                            }
-                            return false;
-                        }
-                    });
-                }
-            });
+//            mediaPlayer = new MediaPlayer();
+//            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+//            mediaPlayer.setDataSource(radio_url);
+//            mediaPlayer.prepareAsync();
+//            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+//                @Override
+//                public void onPrepared(MediaPlayer mp) {
+//                    mp.reset();
+//                    mp.start();
+//
+//                    if (mp.isPlaying()) {
+//                        pbRadio.setVisibility(View.GONE);
+//                    } else {
+//                        pbRadio.setVisibility(View.VISIBLE);
+//                    }
+//
+//                    mp.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+//
+//                        @Override
+//                        public boolean onInfo(MediaPlayer mp, int what, int extra) {
+//                            switch (what) {
+//                                case MediaPlayer.MEDIA_INFO_BUFFERING_START:
+//                                    pbRadio.setVisibility(View.VISIBLE);
+//                                    break;
+//                                case MediaPlayer.MEDIA_INFO_BUFFERING_END:
+//                                    pbRadio.setVisibility(View.GONE);
+//                                    break;
+//
+//                            }
+//                            return false;
+//                        }
+//                    });
+//                }
+//            });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -380,8 +472,10 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
         Glide.with(getActivity()).load(R.drawable.new_zealand_bg).into(ivRadioBg);
         radioList.clear();
         radioList.add(new Radio(Constants.Radio.NewZealand.RADIO_NAME, Constants.Radio.NewZealand.RADIO_LOGO_URL, Constants.Radio.NewZealand.RADIO_STREAM_URL));
-//        radioList.add(new Radio(Constants.Radio.NewZealand.RADIO_NAME_2, Constants.Radio.NewZealand.RADIO_STREAM_URL_2));
-//        radioList.add(new Radio(Constants.Radio.NewZealand.RADIO_NAME_3, Constants.Radio.NewZealand.RADIO_LOGO_URL_3, Constants.Radio.NewZealand.RADIO_STREAM_URL_3));
+        radioList.add(new Radio(Constants.Radio.NewZealand.RADIO_NAME_2, Constants.Radio.NewZealand.RADIO_LOGO_URL_2, Constants.Radio.NewZealand.RADIO_STREAM_URL_2));
+        radioList.add(new Radio(Constants.Radio.NewZealand.RADIO_NAME_3, Constants.Radio.NewZealand.RADIO_LOGO_URL_3, Constants.Radio.NewZealand.RADIO_STREAM_URL_3));
+        radioList.add(new Radio(Constants.Radio.NewZealand.RADIO_NAME_4, Constants.Radio.NewZealand.RADIO_LOGO_URL_4, Constants.Radio.NewZealand.RADIO_STREAM_URL_4));
+        radioList.add(new Radio(Constants.Radio.NewZealand.RADIO_NAME_5, Constants.Radio.NewZealand.RADIO_LOGO_URL_5, Constants.Radio.NewZealand.RADIO_STREAM_URL_5));
         startPlayingRadio();
     }
 
@@ -389,10 +483,10 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
         Glide.with(getActivity()).load(R.drawable.usa_wallpaper).into(ivRadioBg);
         radioList.clear();
         radioList.add(new Radio(Constants.Radio.USA.RADIO_NAME, Constants.Radio.USA.RADIO_LOGO_URL, Constants.Radio.USA.RADIO_STREAM_URL));
-//        radioList.add(new Radio(Constants.Radio.USA.RADIO_NAME_2, Constants.Radio.USA.RADIO_LOGO_URL_2, Constants.Radio.USA.RADIO_STREAM_URL_2));
+        radioList.add(new Radio(Constants.Radio.USA.RADIO_NAME_2, Constants.Radio.USA.RADIO_LOGO_URL_2, Constants.Radio.USA.RADIO_STREAM_URL_2));
         radioList.add(new Radio(Constants.Radio.USA.RADIO_NAME_3, Constants.Radio.USA.RADIO_LOGO_URL_3, Constants.Radio.USA.RADIO_STREAM_URL_3));
-//        radioList.add(new Radio(Constants.Radio.USA.RADIO_NAME_4, Constants.Radio.USA.RADIO_LOGO_URL_4, Constants.Radio.USA.RADIO_STREAM_URL_4));
-//        radioList.add(new Radio(Constants.Radio.USA.RADIO_NAME_5, Constants.Radio.USA.RADIO_STREAM_URL_5));
+        radioList.add(new Radio(Constants.Radio.USA.RADIO_NAME_4, Constants.Radio.USA.RADIO_LOGO_URL_4, Constants.Radio.USA.RADIO_STREAM_URL_4));
+        radioList.add(new Radio(Constants.Radio.USA.RADIO_NAME_5, Constants.Radio.USA.RADIO_LOGO_URL_5, Constants.Radio.USA.RADIO_STREAM_URL_5));
         startPlayingRadio();
     }
 
@@ -403,6 +497,16 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
             radio_image = radioList.get(0).getRadio_image();
             isAudioTrackNeedsChange = true;
             try {
+                int i = 0;
+                List<MediaMetaData> mediaMetaDataList = new ArrayList<>();
+                for (Radio radio : radioList) {
+                    MediaMetaData mediaMetaData = new MediaMetaData();
+                    mediaMetaData.setMediaId(String.valueOf(i));
+                    mediaMetaData.setMediaUrl(radio.getRadio_stream_url());
+                    mediaMetaDataList.add(mediaMetaData);
+                    i++;
+                }
+                streamingManager.setMediaList(mediaMetaDataList);
                 startRadio();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -414,8 +518,10 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
         Glide.with(getActivity()).load(R.drawable.fiji_bg).into(ivRadioBg);
         radioList.clear();
         radioList.add(new Radio(Constants.Radio.Fiji.RADIO_NAME, Constants.Radio.Fiji.RADIO_LOGO_URL, Constants.Radio.Fiji.RADIO_STREAM_URL));
-//        radioList.add(new Radio(Constants.Radio.Fiji.RADIO_NAME_2, Constants.Radio.Fiji.RADIO_LOGO_URL_2,  Constants.Radio.Fiji.RADIO_STREAM_URL_2));
-//        radioList.add(new Radio(Constants.Radio.Fiji.RADIO_NAME_3, Constants.Radio.Fiji.RADIO_LOGO_URL_3,  Constants.Radio.Fiji.RADIO_STREAM_URL_3));
+        radioList.add(new Radio(Constants.Radio.Fiji.RADIO_NAME_2, Constants.Radio.Fiji.RADIO_LOGO_URL_2,  Constants.Radio.Fiji.RADIO_STREAM_URL_2));
+        radioList.add(new Radio(Constants.Radio.Fiji.RADIO_NAME_3, Constants.Radio.Fiji.RADIO_LOGO_URL_3,  Constants.Radio.Fiji.RADIO_STREAM_URL_3));
+        radioList.add(new Radio(Constants.Radio.Fiji.RADIO_NAME_4, Constants.Radio.Fiji.RADIO_LOGO_URL_4,  Constants.Radio.Fiji.RADIO_STREAM_URL_4));
+        radioList.add(new Radio(Constants.Radio.Fiji.RADIO_NAME_5, Constants.Radio.Fiji.RADIO_LOGO_URL_5,  Constants.Radio.Fiji.RADIO_STREAM_URL_5));
         startPlayingRadio();
     }
 
@@ -431,17 +537,6 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
     }
@@ -449,5 +544,74 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
     @Override
     public void onPrepared(MediaPlayer mp) {
         mp.start();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (streamingManager != null) {
+            streamingManager.subscribesCallBack(this);
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (streamingManager != null) {
+            streamingManager.unSubscribeCallBack();
+        }
+    }
+
+    @Override
+    public void updatePlaybackState(int state) {
+        switch (state) {
+            case PlaybackStateCompat.STATE_PLAYING:
+                pbRadio.setVisibility(View.GONE);
+                break;
+            case PlaybackStateCompat.STATE_PAUSED:
+                break;
+            case PlaybackStateCompat.STATE_NONE:
+                break;
+            case PlaybackStateCompat.STATE_STOPPED:
+                break;
+            case PlaybackStateCompat.STATE_BUFFERING:
+                pbRadio.setVisibility(View.VISIBLE);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (streamingManager != null) {
+//                            streamingManager.onStop();
+//                            streamingManager = null;
+                        }
+                        pbRadio.setVisibility(View.GONE);
+                    }
+                }, 10500);
+                break;
+        }
+    }
+
+    @Override
+    public void playSongComplete() {
+
+    }
+
+    @Override
+    public void currentSeekBarPosition(int progress) {
+
+    }
+
+    @Override
+    public void playCurrent(int indexP, MediaMetaData currentAudio) {
+
+    }
+
+    @Override
+    public void playNext(int indexP, MediaMetaData currentAudio) {
+
+    }
+
+    @Override
+    public void playPrevious(int indexP, MediaMetaData currentAudio) {
+
     }
 }

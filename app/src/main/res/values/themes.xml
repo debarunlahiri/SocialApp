@@ -2,8 +2,8 @@
     <!-- Base application theme. -->
     <style name="Theme.SocialApp" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorPrimary">#69b3e7</item>
+        <item name="colorPrimaryVariant">#012169</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
@@ -17,6 +17,60 @@
 
     <style name="MyOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
         <item name="android:tint">@color/white</item>
+    </style>
+
+<!--    <style name="AppTheme.NoActionBar">-->
+<!--        <item name="windowActionBar">false</item>-->
+<!--        <item name="windowNoTitle">true</item>-->
+<!--        <item name="android:windowDrawsSystemBarBackgrounds">false</item>-->
+<!--        <item name="coordinatorLayoutStyle">@style/Widget.Support.CoordinatorLayout</item>-->
+<!--        <item name="android:windowDisablePreview">true</item>-->
+<!--    </style>-->
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="SeekBarColor"
+        parent="Widget.AppCompat.SeekBar">
+        <item name="colorAccent">@color/white</item>
+        <item name="colorControlActivated">@color/colorPrimary</item>
+        <item name="colorControlNormal">@color/white</item>
+    </style>
+
+    <style name="AlertDialogCustom" parent="Theme.AppCompat.Dialog">
+    </style>
+
+
+    <style name="AudioFileInfoOverlayText">
+        <item name="android:textColor">#ffffffff</item>
+        <item name="android:textSize">@dimen/_10sdp</item>
+        <item name="android:shadowColor">#000000</item>
+        <item name="android:shadowDx">1</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">1</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+
+    <style name="ChooseContactBackground">
+        <item name="android:background">#cc9933</item>
+    </style>
+
+    <style name="VerticalDividerForList">
+        <item name="android:layout_width">1px</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:layout_marginLeft">4px</item>
+        <item name="android:background">#444444</item>
+    </style>
+
+    <style name="HorizontalDividerTop">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">1px</item>
+        <item name="android:background">#666677</item>
+    </style>
+    <style name="HorizontalDividerBottom">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">1px</item>
+        <item name="android:background">#000022</item>
     </style>
 
 </resources>

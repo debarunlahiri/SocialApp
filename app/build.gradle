@@ -14,7 +14,7 @@ android {
         targetSdk 31
         versionCode 1
         versionName "1.0"
-
+        multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -28,9 +28,26 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+    compileOptions {
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+
+    implementation 'androidx.multidex:multidex:2.0.1'
 
     implementation 'androidx.appcompat:appcompat:1.4.0'
     implementation 'com.google.android.material:material:1.4.0'
@@ -85,31 +102,22 @@ dependencies {
 
     implementation 'com.github.curioustechizen.android-ago:library:1.4.0'
 
+    implementation 'com.github.dibakarece:DMAudioStreamer:v1.0.5'
+
+    implementation 'com.sothree.slidinguppanel:library:3.3.0'
+    implementation 'jp.wasabeef:picasso-transformations:2.1.0'
+    implementation 'com.ToxicBakery.viewpager.transforms:view-pager-transforms:1.2.32@aar'
+    implementation 'jp.wasabeef:recyclerview-animators:2.2.3'
+    implementation 'me.tankery.lib:circularSeekBar:1.1.4'
+    implementation 'com.timehop.stickyheadersrecyclerview:library:0.4.3@aar'
 
 
-    implementation 'com.google.android.exoplayer:exoplayer:2.16.1'
-    // dependency for exoplayer
+    implementation 'com.github.dibakarece:DMAudioStreamer:v1.0.5'
 
-    implementation 'com.google.android.exoplayer:exoplayer:2.16.1'
+    implementation 'com.google.android.exoplayer:exoplayer:2.17.0'
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.17.0'
+    implementation 'com.google.android.exoplayer:exoplayer-dash:2.17.0'
+    implementation 'com.google.android.exoplayer:exoplayer-ui:2.17.0'
 
-// for core support in exoplayer.
-
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.16.1'
-// for adding dash support in our exoplayer.
-
-    implementation 'com.google.android.exoplayer:exoplayer-dash:2.16.1'
-
-// for adding hls support in exoplayer.
-
-    implementation 'com.google.android.exoplayer:exoplayer-hls:2.16.1'
-
-// for smooth streaming of video in our exoplayer.
-
-    implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.16.1'
-
-// for generating default ui of exoplayer
-
-    implementation 'com.google.android.exoplayer:exoplayer-ui:2.16.1'
-
-
+    implementation 'com.mindorks.android:prdownloader:0.6.0'
 }

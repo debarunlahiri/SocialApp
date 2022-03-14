@@ -70,7 +70,7 @@ public class NotificationIntentService extends IntentService {
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 NOTIFICATION_ID,
                 new Intent(this, MainActivity.class),
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_IMMUTABLE);
         builder.setContentIntent(pendingIntent);
         builder.setDeleteIntent(NotificationEventReceiver.getDeleteIntent(this));
 

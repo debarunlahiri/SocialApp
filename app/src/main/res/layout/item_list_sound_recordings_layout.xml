@@ -73,6 +73,8 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
                 android:text="TextView"
+                android:maxLines="1"
+                android:ellipsize="end"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/ivSetRingtone"
                 app:layout_constraintStart_toEndOf="@+id/linearLayout"

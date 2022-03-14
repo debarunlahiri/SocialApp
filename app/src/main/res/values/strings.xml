@@ -1,4 +1,6 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+
     <string name="app_name">Social App</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -30,4 +32,214 @@
         <item>New Zealand</item>
         <item>India</item>
     </string-array>
+
+    <string name="share_app_msg">Hi! I\'m using a fabulous Video and Music player application. Just try it.</string>
+    <string name="ask_rating_msg">We\'re glad you\'re enjoying out Video and Music player App,do you want to give us 5-Star? It really help us out! Thanks for your support:)</string>
+    <string name="ask_rating_title">Rate Us 5 Stars!</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="artist_image_description">Artist Image</string>
+
+    <string name="menu_sort_by">Sort by</string>
+    <string name="sort_order_entry_az">A-Z</string>
+    <string name="sort_order_entry_za">Z-A</string>
+    <string name="sort_order_entry_artist">Artist</string>
+    <string name="sort_order_entry_album">Album</string>
+    <string name="sort_order_entry_year">Year</string>
+    <string name="sort_order_entry_duration">Duration</string>
+    <string name="sort_order_entry_number_of_songs">Number of songs</string>
+    <string name="sort_order_entry_number_of_albums">Number of albums</string>
+
+    <string name="menu_show_as">View As</string>
+    <string name="menu_show_as_entry_list">List</string>
+    <string name="menu_show_as_entry_grid">Grid</string>
+
+    <string name="count_song"><xliff:g id="count">%d</xliff:g> song</string>
+    <string name="count_songs"><xliff:g id="count">%d</xliff:g> songs</string>
+    <string name="count_album"><xliff:g id="count">%d</xliff:g> album</string>
+    <string name="count_albums"><xliff:g id="count">%d</xliff:g> albums</string>
+
+    <string name="combine_two_strings" translatable="false">%1$s | %2$s</string>
+
+    <string name="album_not_found">Album Not Found</string>
+    <string name="artist_not_found">Artist Not Found</string>
+    <string name="recording_not_found">Call Recording Not Found</string>
+    <string name="gener_not_found">Gener Not Found</string>
+    <string name="ring_not_found">Ring Tone Not Found</string>
+    <string name="song_not_found">Song Not Found</string>
+    <string name="my_folder">My Folders</string>
+    <string name="my_history">My History</string>
+    <string name="my_playlist">My Playlist</string>
+    <string name="settings">Settings</string>
+    <string name="add_to_playlist">Add to Playlist</string>
+    <string name="remove_from_playlist">Remove from Playlist</string>
+    <string name="add_to_queue">Add to Queue</string>
+    <string name="remove_from_queue">Remove from Queue</string>
+    <string name="proparty">Property</string>
+    <string name="share">Share</string>
+
+    <!--Settings-->
+    <string name="main_title">General</string>
+    <string name="sub_title_one">Clear cache</string>
+    <string name="sub_title_two">Check cache usage</string>
+    <string name="sub_title_three">Clear history</string>
+    <string name="sub_title_one_summary">Clear locally cached content</string>
+    <string name="sub_title_two_summary">check for locally cached content size</string>
+    <string name="sub_title_three_summary">clear all songs history</string>
+    <string name="second_title">Advanced</string>
+    <string name="third_title">Music Player</string>
+    <string name="fourth_title">About App</string>
+    <string name="change_theme">Change Theme</string>
+    <string name="change_theme_msg">Change Background,animation,transparency and also add your photo</string>
+    <string name="sub_title_three3">Show widget</string>
+    <string name="sub_title_one11">Version</string>
+    <string name="title_time">Set sleep time</string>
+    <string name="title_snow">Background Animation Effect</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="relevant_ads">Change Relevant Ads Show</string>
+    <string name="total_songs">Total songs : </string>
+
+
+    <!--Equilizer-->
+    <string name="preference_file_key">music_player_preference_settings</string>
+
+    <!--  #####################################################################  -->
+
+    <!--
+     Main / media select activity
+     -->
+
+
+    <string name="search_edit_box">Search</string>
+
+    <string name="button_start_record_activity">Record New</string>
+
+    <string name="button_options">Options</string>
+
+    <!--
+     Edit activity
+     -->
+
+    <!-- Labels next to the start and end time edit boxes -->
+    <string name="start_label">Start:</string>
+    <string name="end_label">End:</string>
+
+    <string name="edit_intent">Edit</string>
+
+    <string name="time_seconds">seconds</string>
+
+
+    <string name="set_default_notification">Saved!  Make this your default notification?</string>
+
+
+    <!-- Progress dialog text for loading, recording, or saving... -->
+    <string name="progress_dialog_loading">Loading…</string>
+    <string name="progress_dialog_recording">Recording…</string>
+    <string name="progress_dialog_saving">Saving…</string>
+    <string name="progress_dialog_cancel">Cancel</string>
+    <string name="progress_dialog_stop">Stop</string>
+
+    <!-- Image button descriptions for accessibility -->
+
+    <string name="start_marker">Start marker</string>
+    <string name="end_marker">End marker</string>
+    <string name="rewind">Rewind</string>
+    <string name="play">Play</string>
+    <string name="stop">Stop</string>
+    <string name="ffwd">Fast forward</string>
+
+    <!--
+     Menu items
+     -->
+
+    <string name="menu_save">Save</string>
+    <string name="menu_reset">Reset</string>
+    <string name="menu_about">About</string>
+    <string name="menu_show_all_audio">Show All Audio</string>
+
+    <!--
+     Context menu items
+     -->
+
+    <string name="context_menu_edit">Edit</string>
+    <string name="context_menu_delete">Delete</string>
+    <string name="context_menu_contact">Assign to Contact</string>
+    <string name="context_menu_default_notification">Set as Default Notification</string>
+
+    <!--
+     File Save dialog
+     -->
+
+    <string name="file_save_title">Save As:</string>
+    <string name="file_save_button_save">Save</string>
+    <string name="file_save_button_cancel">Cancel</string>
+
+
+    <string name="type_music">Music</string>
+    <string name="type_alarm">Alarm</string>
+    <string name="type_notification">Notification</string>
+
+
+    <!--
+     Delete confirmation dialog
+     -->
+
+
+    <string name="delete_alarm">Delete Alarm</string>
+    <string name="delete_notification">Delete Notification</string>
+    <string name="delete_music">Delete Music</string>
+    <string name="delete_audio">Delete Audio</string>
+
+
+    <string name="delete_ok_button">Delete</string>
+    <string name="delete_cancel_button">Cancel</string>
+
+    <string name="delete_failed">Unable to delete file</string>
+
+    <!--
+     Success and error messages
+     -->
+
+    <string name="alert_title_success">Success</string>
+    <string name="alert_title_failure">Error</string>
+    <string name="alert_ok_button">OK</string>
+    <string name="alert_yes_button">Yes, please!</string>
+    <string name="alert_no_button">No, thanks.</string>
+
+    <string name="save_success_message">Saved!</string>
+    <string name="default_notification_success_message">Changed default notification sound</string>
+    <string name="play_error">Unable to play this media file</string>
+    <string name="no_unique_filename">Unable to find unique filename</string>
+    <string name="record_error">Error recording audio</string>
+    <string name="too_small_error">Can\'t save a file that small, try making it longer.</string>
+    <string name="write_error">Error writing file</string>
+    <string name="read_error">Error reading file</string>
+    <string name="no_space_error">Your SD card is full, there is not enough space to save this file.</string>
+
+
+    <!--
+     Choose Contact Activity
+     -->
+
+
+    <string name="default_notification_channel_id" translatable="false">10002020</string>
+    <string name="transparancy">Transparancy</string>
+    <string name="blur">Blur</string>
+    <string name="todo">TODO</string>
+
+
+    <string name="video">Video</string>
+    <string name="music">Music</string>
+    <string name="status">Status</string>
+    <string name="setting">Setting</string>
+    <string name="video_types">mp4</string>
+    <string name="msg_deleted">File Deleted</string>
+    <string name="msg_deleted_error">File Can not Delete !</string>
+
+
+    <string name="strPolicy">https://www.google.co.in/</string>
+    <string name="appId">ca-app-pub-3940256099942544~3347511713</string>
+
 </resources>
