@@ -1,7 +1,7 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
 
-    <string name="app_name">Social App</string>
+    <string name="app_name">Taki Tym</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
@@ -16,7 +16,7 @@
     <string name="error_retry">Failed to connect to stream&#8230;</string>
     <string name="error_retry_later">Please try again in a few seconds&#8230;</string>
     <string name="radio_playing_other">Already playing another station. Press play again to play this station instead.</string>
-    <string name="empty_textview">Error loading data</string>
+    <string name="empty_textview">Error loading userStatusData</string>
 
     <string name="fiji">Fiji</string>
     <string name="usa">United States of America</string>
@@ -29,8 +29,8 @@
         <item>Select Country</item>
         <item>Fiji</item>
         <item>United States of America</item>
-        <item>New Zealand</item>
         <item>India</item>
+        <item>New Zealand</item>
     </string-array>
 
     <string name="share_app_msg">Hi! I\'m using a fabulous Video and Music player application. Just try it.</string>

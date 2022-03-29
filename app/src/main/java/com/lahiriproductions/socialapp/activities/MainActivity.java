@@ -1,6 +1,7 @@
 package com.lahiriproductions.socialapp.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.NotificationCompat;
@@ -25,6 +26,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -36,6 +45,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.lahiriproductions.socialapp.AppInterface.ApiInterface;
 import com.lahiriproductions.socialapp.R;
 import com.lahiriproductions.socialapp.adapter.BottomViewPagerAdapter;
 import com.lahiriproductions.socialapp.utils.Constants;
@@ -44,6 +54,9 @@ import com.lahiriproductions.socialapp.utils.MyBroadcastService;
 import com.lahiriproductions.socialapp.utils.NonSwipeableViewPager;
 import com.lahiriproductions.socialapp.utils.NotificationEventReceiver;
 import com.lahiriproductions.socialapp.utils.Variables;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -106,6 +119,34 @@ public class MainActivity extends AppCompatActivity {
         if (currentUser == null) {
             sendToMain();
         } else {
+            Log.e(TAG, "onCreate: " + Controller.getUserStatus(mContext, mAuth.getCurrentUser().getUid()));
+            if (!Controller.getUserStatus(mContext, mAuth.getCurrentUser().getUid())) {
+                Toast.makeText(MainActivity.this, "You have been blocked", Toast.LENGTH_SHORT).show();
+                Controller.logout(mContext, mAuth);
+            }
+            mDatabase.child("users").child(mAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        String name = snapshot.child("name").getValue().toString();
+                        String email = snapshot.child("email").getValue().toString();
+                        String age = snapshot.child("age").getValue().toString();
+                        String profile_image = snapshot.child("profile_image").getValue().toString();
+                        if (!snapshot.child("profile_image").exists()) {
+                            insertUser(name, email, age, null);
+                        } else {
+                            insertUser(name, email, age, profile_image);
+                        }
+                        Log.e(TAG, "onDataChange: " + email);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
             mDatabase.child("users").child(currentUser.getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -218,6 +259,38 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void insertUser(String name, String email, String age, String profile_image) {
+        RequestQueue requestQueue = Volley.newRequestQueue(mContext);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, ApiInterface.API_INSERT_USER, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                if (response != null) {
+                    Log.e(TAG, "onResponse: " + response);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(mContext, "Internal server error", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "onErrorResponse: ", error);
+            }
+        }) {
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String, String> params = new HashMap<>();
+                params.put("phone", mAuth.getCurrentUser().getPhoneNumber());
+                params.put("email", email);
+                params.put("user_id", mAuth.getCurrentUser().getUid());
+                params.put("age", age);
+                params.put("image", profile_image);
+                params.put("username", mAuth.getCurrentUser().getPhoneNumber());
+                params.put("password", "password");
+                return params;
+            }
+        };
+        requestQueue.add(stringRequest);
+    }
 
 
     @Override
@@ -311,3 +384,5 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 }
+
+//{"status":1,"message":"successfully register;","data":[{"phone":"+919205225428","email":"debarunlahiri2011@gmail.com","username":"+919205225428","user_id":"dhPH352UKwg31IGExhvkq5qhbF72","image":"DataSnapshot { key = profile_image, value = https:\/\/firebasestorage.googleapis.com\/v0\/b\/takitym-2e39c.appspot.com\/o\/users%2Fprofiles%2Fprofile_images%2FdhPH352UKwg31IGExhvkq5qhbF72.jpg?alt=media&token=14fc2ebe-9def-43ca-a72e-3eea291d58a0 }","token":47232}]}

@@ -3,10 +3,10 @@ package com.lahiriproductions.socialapp.models;
 public class Radio {
 
     private String radio_name;
-    private int radio_image;
+    private String radio_image;
     private String radio_stream_url;
 
-    public Radio(String radio_name, int radio_image, String radio_stream_url) {
+    public Radio(String radio_name, String radio_image, String radio_stream_url) {
         this.radio_name = radio_name;
         this.radio_image = radio_image;
         this.radio_stream_url = radio_stream_url;
@@ -28,11 +28,11 @@ public class Radio {
         this.radio_stream_url = radio_stream_url;
     }
 
-    public int getRadio_image() {
+    public String getRadio_image() {
         return radio_image;
     }
 
-    public void setRadio_image(int radio_image) {
+    public void setRadio_image(String radio_image) {
         this.radio_image = radio_image;
     }
 }

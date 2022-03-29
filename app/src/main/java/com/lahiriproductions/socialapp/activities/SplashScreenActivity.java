@@ -15,10 +15,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.lahiriproductions.socialapp.AppService.MyService;
 import com.lahiriproductions.socialapp.R;
 import com.lahiriproductions.socialapp.data_helper.DataBaseHelper;
 import com.lahiriproductions.socialapp.main_functions.ConstantData;
+import com.lahiriproductions.socialapp.utils.Controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +36,7 @@ public class SplashScreenActivity extends AppCompatActivity {
     ArrayList<String> permissionsList;
     DataBaseHelper dataBaseHelper;
     boolean isFinish = true;
-
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,12 @@ public class SplashScreenActivity extends AppCompatActivity {
 
         context = this;
         activity = this;
+
+        mAuth = FirebaseAuth.getInstance();
+
+        if (mAuth.getCurrentUser() != null) {
+            Controller.getUserStatus(SplashScreenActivity.this, mAuth.getCurrentUser().getUid());
+        }
 
         if (Build.VERSION.SDK_INT >= 23) {
             phoneStatePermission = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE);
@@ -103,8 +111,15 @@ public class SplashScreenActivity extends AppCompatActivity {
             //  Intent intent = new Intent(context, SongsMainActivity.class);
 
             // mainAct();
-            startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
-            finish();
+            if (mAuth.getCurrentUser() == null) {
+                startActivity(new Intent(SplashScreenActivity.this, LoginActivity.class));
+                finish();
+            } else {
+                Controller.getUserStatus(SplashScreenActivity.this, mAuth.getCurrentUser().getUid());
+                startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
+                finish();
+            }
+
         }
 
         @Override

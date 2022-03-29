@@ -3,12 +3,16 @@ package com.lahiriproductions.socialapp.AppInterface;
 import com.google.protobuf.Api;
 import com.lahiriproductions.socialapp.models.QitoRingtone;
 import com.lahiriproductions.socialapp.models.SendNotification;
+import com.lahiriproductions.socialapp.models.UserStatus.UserStatus;
+import com.lahiriproductions.socialapp.models.UserStatus.UserStatusData;
+import com.lahiriproductions.socialapp.models.UserStatusRequest;
 
 import java.util.Map;
 
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -30,5 +34,11 @@ public interface ApiCalls {
     @POST(ApiInterface.API_INSERT_NOTIFICATION)
     @FormUrlEncoded
     Call<SendNotification> sendNotification(@FieldMap Map<String,String> params);
+
+    @Headers("Content-Type: application/json")
+    @POST(ApiInterface.API_GET_USER_STATUS)
+//    @FormUrlEncoded
+//    Call<UserStatusData> getUserStatus(@FieldMap Map<String,String> params);
+    Call<UserStatusData> getUserStatus(@Body UserStatusRequest userStatusRequest);
 
 }

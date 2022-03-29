@@ -26,6 +26,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.gauravk.audiovisualizer.visualizer.CircleLineVisualizer;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -39,13 +45,20 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
+import com.lahiriproductions.socialapp.AppInterface.ApiInterface;
 import com.lahiriproductions.socialapp.R;
 import com.lahiriproductions.socialapp.models.Radio;
 import com.lahiriproductions.socialapp.utils.Constants;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import dm.audiostreamer.AudioStreamingManager;
 import dm.audiostreamer.CurrentSessionCallback;
@@ -87,7 +100,7 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
     private boolean isAudioTrackNeedsChange = false;
     private String radio_name;
     private boolean isPrepared = false;
-    private int radio_image;
+    private String radio_image;
     private CircleLineVisualizer mVisualizer;
     private boolean isAlreadyPlayed = false;
     private Context mContext;
@@ -175,6 +188,7 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
         actRadioCountries.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                getRadioList(position);
                 if ((position == 0)) {
                     radio_stream_position = 0;
                     isAlreadyPlayed = true;
@@ -190,28 +204,24 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
                     radio_stream_position = 0;
                     isAlreadyPlayed = true;
                     ibRadioNext.setEnabled(true);
-                    setupFijiRadio();
                     cvRadioArt.setVisibility(View.VISIBLE);
                     tvRadioName.setVisibility(View.VISIBLE);
                 } else if (position == 2) {
                     radio_stream_position = 0;
                     isAlreadyPlayed = true;
                     ibRadioNext.setEnabled(true);
-                    setupUSARadio();
                     cvRadioArt.setVisibility(View.VISIBLE);
                     tvRadioName.setVisibility(View.VISIBLE);
                 } else if (position == 3) {
                     radio_stream_position = 0;
                     isAlreadyPlayed = true;
                     ibRadioNext.setEnabled(true);
-                    setupNewZealandRadio();
                     cvRadioArt.setVisibility(View.VISIBLE);
                     tvRadioName.setVisibility(View.VISIBLE);
                 } else if (position == 4) {
                     radio_stream_position = 0;
                     isAlreadyPlayed = true;
                     ibRadioNext.setEnabled(true);
-                    setupIndiaRadio();
                     cvRadioArt.setVisibility(View.VISIBLE);
                     tvRadioName.setVisibility(View.VISIBLE);
                 }
@@ -339,6 +349,51 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
         });
     }
 
+    private void getRadioList(int position) {
+        RequestQueue requestQueue = Volley.newRequestQueue(mContext);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, ApiInterface.API_GET_RADIO, new com.android.volley.Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                if (response != null) {
+                    try {
+                        radioList.clear();
+                        Log.e(TAG, "onResponse: " + response);
+                        JSONObject jsonObject = new JSONObject(response);
+                        JSONArray jsonArray = new JSONArray(jsonObject.getString("data"));
+                        for (int i=0; i<jsonArray.length(); i++) {
+                            JSONObject jsonObjectRadio = jsonArray.getJSONObject(i);
+                            String radio_name = jsonObjectRadio.getString("Radio_name");
+                            String radio_logo_url = jsonObjectRadio.getString("radio_logo_url");
+                            String radio_stream_url = jsonObjectRadio.getString("radio_stream_url");
+                            radioList.add(new Radio(radio_name, radio_logo_url, radio_stream_url));
+                            if (i == jsonArray.length()-1) {
+                                startPlayingRadio();
+                            }
+                        }
+                        Log.e(TAG, "onResponse: " + jsonObject);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "onFailure: ", error);
+            }
+        }) {
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String, String> params = new HashMap<>();
+                params.put("cid", String.valueOf(position));
+                Log.e(TAG, "getParams: " + params);
+                return params;
+            }
+        };
+        requestQueue.add(stringRequest);
+    }
+
     private void startRadio() throws IOException {
         try {
             if (exoPlayer != null) {
@@ -454,42 +509,6 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
 
     }
 
-
-    private void setupIndiaRadio() {
-        Glide.with(getActivity()).load(Constants.Radio.India.RADIO_LOGO_URL_2).into(ivRadioBg);
-        radioList.clear();
-        radioList.add(new Radio(Constants.Radio.India.RADIO_NAME_2, Constants.Radio.India.RADIO_LOGO_URL_2, Constants.Radio.India.RADIO_STREAM_URL_2));
-        radioList.add(new Radio(Constants.Radio.India.RADIO_NAME_3, Constants.Radio.India.RADIO_LOGO_URL_3, Constants.Radio.India.RADIO_STREAM_URL_3));
-        radioList.add(new Radio(Constants.Radio.India.RADIO_NAME_4, Constants.Radio.India.RADIO_LOGO_URL_4, Constants.Radio.India.RADIO_STREAM_URL_4));
-        radioList.add(new Radio(Constants.Radio.India.RADIO_NAME_6, Constants.Radio.India.RADIO_LOGO_URL_6, Constants.Radio.India.RADIO_STREAM_URL_6));
-        radioList.add(new Radio(Constants.Radio.India.RADIO_NAME_7, Constants.Radio.India.RADIO_LOGO_URL_7, Constants.Radio.India.RADIO_STREAM_URL_7));
-        radioList.add(new Radio(Constants.Radio.India.RADIO_NAME_8, Constants.Radio.India.RADIO_LOGO_URL_8, Constants.Radio.India.RADIO_STREAM_URL_8));
-        startPlayingRadio();
-        Glide.with(getActivity()).load(Constants.Radio.India.RADIO_LOGO_URL_2).into(ivRadioBg);
-    }
-
-    private void setupNewZealandRadio() {
-        Glide.with(getActivity()).load(R.drawable.new_zealand_bg).into(ivRadioBg);
-        radioList.clear();
-        radioList.add(new Radio(Constants.Radio.NewZealand.RADIO_NAME, Constants.Radio.NewZealand.RADIO_LOGO_URL, Constants.Radio.NewZealand.RADIO_STREAM_URL));
-        radioList.add(new Radio(Constants.Radio.NewZealand.RADIO_NAME_2, Constants.Radio.NewZealand.RADIO_LOGO_URL_2, Constants.Radio.NewZealand.RADIO_STREAM_URL_2));
-        radioList.add(new Radio(Constants.Radio.NewZealand.RADIO_NAME_3, Constants.Radio.NewZealand.RADIO_LOGO_URL_3, Constants.Radio.NewZealand.RADIO_STREAM_URL_3));
-        radioList.add(new Radio(Constants.Radio.NewZealand.RADIO_NAME_4, Constants.Radio.NewZealand.RADIO_LOGO_URL_4, Constants.Radio.NewZealand.RADIO_STREAM_URL_4));
-        radioList.add(new Radio(Constants.Radio.NewZealand.RADIO_NAME_5, Constants.Radio.NewZealand.RADIO_LOGO_URL_5, Constants.Radio.NewZealand.RADIO_STREAM_URL_5));
-        startPlayingRadio();
-    }
-
-    private void setupUSARadio() {
-        Glide.with(getActivity()).load(R.drawable.usa_wallpaper).into(ivRadioBg);
-        radioList.clear();
-        radioList.add(new Radio(Constants.Radio.USA.RADIO_NAME, Constants.Radio.USA.RADIO_LOGO_URL, Constants.Radio.USA.RADIO_STREAM_URL));
-        radioList.add(new Radio(Constants.Radio.USA.RADIO_NAME_2, Constants.Radio.USA.RADIO_LOGO_URL_2, Constants.Radio.USA.RADIO_STREAM_URL_2));
-        radioList.add(new Radio(Constants.Radio.USA.RADIO_NAME_3, Constants.Radio.USA.RADIO_LOGO_URL_3, Constants.Radio.USA.RADIO_STREAM_URL_3));
-        radioList.add(new Radio(Constants.Radio.USA.RADIO_NAME_4, Constants.Radio.USA.RADIO_LOGO_URL_4, Constants.Radio.USA.RADIO_STREAM_URL_4));
-        radioList.add(new Radio(Constants.Radio.USA.RADIO_NAME_5, Constants.Radio.USA.RADIO_LOGO_URL_5, Constants.Radio.USA.RADIO_STREAM_URL_5));
-        startPlayingRadio();
-    }
-
     private void startPlayingRadio() {
         if (!radioList.isEmpty()) {
             radio_url = radioList.get(0).getRadio_stream_url();
@@ -507,22 +526,12 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
                     i++;
                 }
                 streamingManager.setMediaList(mediaMetaDataList);
+                llRadioPlaceHolder.setVisibility(View.GONE);
                 startRadio();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-    }
-
-    private void setupFijiRadio() {
-        Glide.with(getActivity()).load(R.drawable.fiji_bg).into(ivRadioBg);
-        radioList.clear();
-        radioList.add(new Radio(Constants.Radio.Fiji.RADIO_NAME, Constants.Radio.Fiji.RADIO_LOGO_URL, Constants.Radio.Fiji.RADIO_STREAM_URL));
-        radioList.add(new Radio(Constants.Radio.Fiji.RADIO_NAME_2, Constants.Radio.Fiji.RADIO_LOGO_URL_2,  Constants.Radio.Fiji.RADIO_STREAM_URL_2));
-        radioList.add(new Radio(Constants.Radio.Fiji.RADIO_NAME_3, Constants.Radio.Fiji.RADIO_LOGO_URL_3,  Constants.Radio.Fiji.RADIO_STREAM_URL_3));
-        radioList.add(new Radio(Constants.Radio.Fiji.RADIO_NAME_4, Constants.Radio.Fiji.RADIO_LOGO_URL_4,  Constants.Radio.Fiji.RADIO_STREAM_URL_4));
-        radioList.add(new Radio(Constants.Radio.Fiji.RADIO_NAME_5, Constants.Radio.Fiji.RADIO_LOGO_URL_5,  Constants.Radio.Fiji.RADIO_STREAM_URL_5));
-        startPlayingRadio();
     }
 
     @Override

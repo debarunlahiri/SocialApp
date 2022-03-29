@@ -150,7 +150,6 @@ public class EventsFragment extends Fragment {
                 @Override
                 public void onFailure(Call<Events> call, Throwable t) {
                     Log.e(TAG, "onFailure: " + new Gson().toJson(t));
-
                     Toast.makeText(mContext, "Internal server error", Toast.LENGTH_SHORT).show();
                 }
             });

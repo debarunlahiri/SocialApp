@@ -32,6 +32,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.lahiriproductions.socialapp.R;
+import com.lahiriproductions.socialapp.utils.Controller;
 
 import java.util.concurrent.TimeUnit;
 
@@ -198,6 +199,7 @@ public class OtpActivity extends AppCompatActivity {
 
                             FirebaseUser user = task.getResult().getUser();
                             // Update UI
+                            Controller.getUserStatus(OtpActivity.this, user.getUid());
                             sendToProfile(user);
                         } else {
                             // Sign in failed, display a message and update the UI

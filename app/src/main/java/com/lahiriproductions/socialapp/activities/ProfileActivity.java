@@ -193,7 +193,12 @@ public class ProfileActivity extends AppCompatActivity {
                 } else if (!Controller.isValidEmail(email)) {
                     tilProfileEmail.setError("Please enter valid email");
                 } else {
-                    updateProfile(name, email, age);
+                    if (Controller.getUserStatus(mContext, mAuth.getCurrentUser().getUid())) {
+                        updateProfile(name, email, age);
+                    } else {
+                        Toast.makeText(ProfileActivity.this, "You have been blocked", Toast.LENGTH_SHORT).show();
+                        Controller.logout(ProfileActivity.this, mAuth);
+                    }
                 }
             }
         });
