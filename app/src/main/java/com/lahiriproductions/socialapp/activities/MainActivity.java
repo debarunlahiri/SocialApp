@@ -131,10 +131,10 @@ public class MainActivity extends AppCompatActivity {
                         String name = snapshot.child("name").getValue().toString();
                         String email = snapshot.child("email").getValue().toString();
                         String age = snapshot.child("age").getValue().toString();
-                        String profile_image = snapshot.child("profile_image").getValue().toString();
                         if (!snapshot.child("profile_image").exists()) {
                             insertUser(name, email, age, null);
                         } else {
+                            String profile_image = snapshot.child("profile_image").getValue().toString();
                             insertUser(name, email, age, profile_image);
                         }
                         Log.e(TAG, "onDataChange: " + email);

@@ -6,12 +6,12 @@ plugins {
 }
 
 android {
-    compileSdk 31
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.lahiriproductions.socialapp"
         minSdk 21
-        targetSdk 31
+        targetSdk 33
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -32,11 +32,12 @@ android {
     dexOptions {
         javaMaxHeapSize "4g"
     }
-
-    lintOptions {
-        checkReleaseBuilds false
+    lint {
         abortOnError false
+        checkReleaseBuilds false
     }
+    namespace 'com.lahiriproductions.socialapp'
+
 
     compileOptions {
         targetCompatibility JavaVersion.VERSION_1_8
