@@ -20,6 +20,7 @@ import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.Path;
 
 public interface ApiCalls {
 
@@ -28,8 +29,8 @@ public interface ApiCalls {
     Call<com.lahiriproductions.socialapp.events.Events> getEvents();
 
     @Headers("Content-Type: application/json")
-    @GET(ApiInterface.API_GET_RINGTONE)
-    Call<QitoRingtone> getRingtones();
+    @GET("index/api_mobile/ring")
+    Call<QitoRingtone> getRingtones(@Path("api_number") String api_number);
 
     @POST(ApiInterface.API_INSERT_NOTIFICATION)
     @FormUrlEncoded

@@ -1,7 +1,7 @@
 package com.lahiriproductions.socialapp.fragments;
 
-import static android.app.Activity.RESULT_OK;
-
+import android.animation.ObjectAnimator;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,22 +15,28 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.lahiriproductions.socialapp.R;
 import com.lahiriproductions.socialapp.activities.SoundRecordingsActivity;
 import com.lahiriproductions.socialapp.adapter.StopWatchLapAdapter;
@@ -43,6 +49,7 @@ import com.yashovardhan99.timeit.Stopwatch;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -77,6 +84,7 @@ public class StopWatchFragment extends Fragment {
     private ImageButton ibPause;
     private Button ibPlayPause, ibReset;
     private Button bSetLap, bSoundRecordings;
+    private ImageView ivStopWatchHand, ivStopWatch;
     private boolean isPaused = false;
     private boolean isStarted = false;
     private boolean isReset = false;
@@ -91,9 +99,11 @@ public class StopWatchFragment extends Fragment {
     private Ringtone ringtone;
     private Uri ringtoneUri;
     private String selectedAudioPath2;
+//    private Animation animation;
+    private ObjectAnimator animation;
 
     List<Integer> soundList = new ArrayList<Integer>();
-
+    private long entered_time = -1;
 
 
     public StopWatchFragment() {
@@ -151,8 +161,18 @@ public class StopWatchFragment extends Fragment {
         bSoundRecordings = view.findViewById(R.id.bSoundRecordings);
         ibPause = view.findViewById(R.id.ibPause);
         tvSelectedAudioName = view.findViewById(R.id.tvSelectedAudioName);
+        ivStopWatchHand = view.findViewById(R.id.ivStopWatchHand);
+        ivStopWatch = view.findViewById(R.id.ivStopWatch);
 
         stopwatch = new com.yashovardhan99.timeit.Stopwatch();
+//        animation = AnimationUtils.loadAnimation(requireContext(), R.anim.roundingalone);
+        ivStopWatchHand.setRotation(33f);
+
+        animation = ObjectAnimator.ofFloat(ivStopWatchHand, "rotation", 33, 360);
+//        animation.setDuration(1000);
+        animation.setRepeatCount(ObjectAnimator.INFINITE);
+//        animation.setRepeatMode(ObjectAnimator.INFINITE);
+
 
         rvStopWatchLap = view.findViewById(R.id.rvStopWatchLap);
         stopWatchLapAdapter = new StopWatchLapAdapter(mContext, stopWatchLapList);
@@ -177,23 +197,30 @@ public class StopWatchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 try {
-                    if (stopwatch.isStarted() && !stopwatch.isPaused()) {
-                        stopwatch.pause();
-                        ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_play_arrow_24, 0, 0, 0);
-                        ibPlayPause.setText("Resume");
-                    } else if (stopwatch.isPaused()) {
-                        stopwatch.resume();
-                        ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_pause_24, 0, 0, 0);
-                        ibPlayPause.setText("Pause");
+                    if (entered_time < 0) {
+                        showSelectSecondDialog();
                     } else {
-                        if (selectedAudioPath != null) {
-                            tvSelectedAudioName.setVisibility(View.VISIBLE);
+                        if (stopwatch.isStarted() && !stopwatch.isPaused()) {
+                            stopwatch.pause();
+                            ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_play_arrow_24, 0, 0, 0);
+                            ibPlayPause.setText("Resume");
+                            animation.pause();
+                        } else if (stopwatch.isPaused()) {
+                            stopwatch.resume();
+                            ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_pause_24, 0, 0, 0);
+                            ibPlayPause.setText("Pause");
+                            animation.resume();
                         } else {
-                            tvSelectedAudioName.setVisibility(View.GONE);
+                            if (selectedAudioPath != null) {
+                                tvSelectedAudioName.setVisibility(View.VISIBLE);
+                            } else {
+                                tvSelectedAudioName.setVisibility(View.GONE);
+                            }
+                            stopwatch.start();
+                            ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_pause_24, 0, 0, 0);
+                            ibPlayPause.setText("Pause");
+                            animation.start();
                         }
-                        stopwatch.start();
-                        ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_pause_24, 0, 0, 0);
-                        ibPlayPause.setText("Pause");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -260,6 +287,8 @@ public class StopWatchFragment extends Fragment {
                     ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_play_arrow_24, 0, 0, 0);
                     ibPlayPause.setText("Start");
                     lapMilLi = 0;
+                    entered_time = -1;
+                    animation.end();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -335,7 +364,56 @@ public class StopWatchFragment extends Fragment {
         bSoundRecordings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(mContext, SoundRecordingsActivity.class));
+//                startActivity(new Intent(mContext, SoundRecordingsActivity.class));
+                showPopup(v);
+            }
+        });
+    }
+
+    private void showPopup(View v) {
+        PopupMenu popup = new PopupMenu(requireContext(), v);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.main_menu, popup.getMenu());
+        popup.show();
+
+    }
+
+
+    private void showSelectSecondDialog() {
+        Dialog dialog = new Dialog(requireContext());
+        dialog.setContentView(R.layout.dialog_second_picker_layout);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.show();
+
+        TextInputLayout tilEnterSecond = dialog.findViewById(R.id.tilEnterSecond);
+        TextInputEditText tieEnterSecond = dialog.findViewById(R.id.tieEnterSecond);
+        Button bDialogSaveSecond = dialog.findViewById(R.id.bDialogSaveSecond);
+        ImageButton ibDialogEnterSecondClose = dialog.findViewById(R.id.ibDialogEnterSecondClose);
+
+        bDialogSaveSecond.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String selected_time = tieEnterSecond.getText().toString();
+
+                if (selected_time.isEmpty()) {
+                    tilEnterSecond.setError("Please enter minutes");
+                } else {
+                    entered_time = TimeUnit.MINUTES.toMillis(Long.parseLong(selected_time));
+                    lapMilLi = entered_time;
+                    animation.setDuration(lapMilLi);
+                    Log.e(TAG, "onClick: " + lapMilLi);
+
+                    if (selectedAudioPath != null) {
+                        tvSelectedAudioName.setVisibility(View.VISIBLE);
+                    } else {
+                        tvSelectedAudioName.setVisibility(View.GONE);
+                    }
+                    stopwatch.start();
+                    ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_pause_24, 0, 0, 0);
+                    ibPlayPause.setText("Pause");
+                    animation.start();
+                    dialog.dismiss();
+                }
             }
         });
     }
@@ -397,6 +475,7 @@ public class StopWatchFragment extends Fragment {
 
     private void updateGUI(Intent intent) {
         if (intent.getExtras() != null) {
+            Log.e(TAG, "updateGUI: " + stopwatch.getElapsedTime());
             stopwatch.setTextView(tvStopWatch);
         }
     }

@@ -94,6 +94,7 @@ public class SoundRecordingsActivity extends AppCompatActivity implements SoundR
             soundRecordingsAdapter = new SoundRecordingsAdapter(mContext, fileArrayList, this::onItemClick);
             rvSoundRecording.setLayoutManager(new LinearLayoutManager(mContext));
             rvSoundRecording.setAdapter(soundRecordingsAdapter);
+            getFaltuSongsList("4");
         } else if (list_type.equalsIgnoreCase("qito_mix")) {
             fabAddSound.setVisibility(View.VISIBLE);
             soundRecordingsAdapter = new SoundRecordingsAdapter(mContext, fileArrayList, this::onItemClick);
@@ -104,7 +105,25 @@ public class SoundRecordingsActivity extends AppCompatActivity implements SoundR
             qitoRingtoneAdapter = new QitoRingtoneAdapter(mContext, qitoRingtoneList);
             rvSoundRecording.setLayoutManager(new LinearLayoutManager(mContext));
             rvSoundRecording.setAdapter(qitoRingtoneAdapter);
-            getFaltuSongsList();
+            getFaltuSongsList("");
+        } else if (list_type.equalsIgnoreCase("normal")) {
+            fabAddSound.setVisibility(View.GONE);
+            qitoRingtoneAdapter = new QitoRingtoneAdapter(mContext, qitoRingtoneList);
+            rvSoundRecording.setLayoutManager(new LinearLayoutManager(mContext));
+            rvSoundRecording.setAdapter(qitoRingtoneAdapter);
+            getFaltuSongsList("1");
+        } else if (list_type.equalsIgnoreCase("adult")) {
+            fabAddSound.setVisibility(View.GONE);
+            qitoRingtoneAdapter = new QitoRingtoneAdapter(mContext, qitoRingtoneList);
+            rvSoundRecording.setLayoutManager(new LinearLayoutManager(mContext));
+            rvSoundRecording.setAdapter(qitoRingtoneAdapter);
+            getFaltuSongsList("2");
+        } else if (list_type.equalsIgnoreCase("sound")) {
+            fabAddSound.setVisibility(View.GONE);
+            qitoRingtoneAdapter = new QitoRingtoneAdapter(mContext, qitoRingtoneList);
+            rvSoundRecording.setLayoutManager(new LinearLayoutManager(mContext));
+            rvSoundRecording.setAdapter(qitoRingtoneAdapter);
+            getFaltuSongsList("3");
         } else {
             fabAddSound.setVisibility(View.GONE);
             otherSoundRecordingsAdapter = new OtherSoundRecordingsAdapter(mContext, soundRecordingsList);
@@ -127,7 +146,7 @@ public class SoundRecordingsActivity extends AppCompatActivity implements SoundR
 
     }
 
-    private void getFaltuSongsList() {
+    private void getFaltuSongsList(String api_number) {
         try {
             Gson gson = new GsonBuilder()
                     .setLenient()
@@ -138,7 +157,7 @@ public class SoundRecordingsActivity extends AppCompatActivity implements SoundR
                     .build();
 
             ApiCalls apiCalls = retrofit.create(ApiCalls.class);
-            Call<QitoRingtone> qitoRingtoneCall = apiCalls.getRingtones();
+            Call<QitoRingtone> qitoRingtoneCall = apiCalls.getRingtones(api_number);
             qitoRingtoneCall.enqueue(new Callback<QitoRingtone>() {
                 @Override
                 public void onResponse(Call<QitoRingtone> call, Response<QitoRingtone> response) {

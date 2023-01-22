@@ -71,7 +71,6 @@ public class ArtistListFrag extends Fragment {
         setLayoutManager();
 
         if (ConstantData.artistArrayList.size() > 0) {
-
             if (getActivity() != null) {
                 new Handler().postDelayed(new Runnable() {
                     @Override
@@ -87,12 +86,7 @@ public class ArtistListFrag extends Fragment {
 
         } else {
             if (getActivity() != null) {
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        new loadArtists().execute("");
-                    }
-                }, 50);
+                new Handler().postDelayed(() -> new loadArtists().execute(""), 50);
             }
         }
 

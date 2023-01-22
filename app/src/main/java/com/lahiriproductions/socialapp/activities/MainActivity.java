@@ -342,6 +342,24 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(mContext, "Random ringtone enabled", Toast.LENGTH_SHORT).show();
                 return true;
 
+            case R.id.normal_stop_menu_list_item:
+                soundRecordingIntent.putExtra("list_type", "normal");
+                startActivity(soundRecordingIntent);
+                Variables.isRingtoneOn = false;
+                return true;
+
+            case R.id.adult_stop_menu_list_item:
+                soundRecordingIntent.putExtra("list_type", "adult");
+                startActivity(soundRecordingIntent);
+                Variables.isRingtoneOn = false;
+                return true;
+
+            case R.id.sound_stop_menu_list_item:
+                soundRecordingIntent.putExtra("list_type", "sound");
+                startActivity(soundRecordingIntent);
+                Variables.isRingtoneOn = false;
+                return true;
+
             case R.id.edit_profile_stop_menu_list_item:
                 Intent profileIntent = new Intent(MainActivity.this, ProfileActivity.class);
                 profileIntent.putExtra("isEdit", true);

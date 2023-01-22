@@ -161,6 +161,7 @@ public class Controller {
             protected Map<String, String> getParams() throws AuthFailureError {
                 HashMap<String, String> params = new HashMap<>();
                 params.put("user_id", user_id);
+                Log.e(TAG, "getParams: " + ApiInterface.API_GET_USER_STATUS + " " + new Gson().toJson(params));
                 return params;
             }
         };

@@ -199,6 +199,7 @@ public class ProfileActivity extends AppCompatActivity {
                         Toast.makeText(ProfileActivity.this, "You have been blocked", Toast.LENGTH_SHORT).show();
                         Controller.logout(ProfileActivity.this, mAuth);
                     }
+                    updateProfile(name, email, age);
                 }
             }
         });

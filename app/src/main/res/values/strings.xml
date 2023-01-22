@@ -6,7 +6,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="description_permission">Storage Files Access is needed in order to save your downloaded files and for WhatsApp Status Saver To work, some features may not work if don\'t allow this permission</string>
-    <string name="storage_reference_url">gs://takitym-2e39c.appspot.com</string>
+    <string name="storage_reference_url">gs://taki-tym.appspot.com</string>
 
     <!-- media viewer and radio-->
     <string name="volume_low">Turn your volume up!</string>

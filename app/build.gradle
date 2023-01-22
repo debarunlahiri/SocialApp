@@ -9,7 +9,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.lahiriproductions.socialapp"
+        applicationId "com.lahiriproductions.takitym"
         minSdk 21
         targetSdk 33
         versionCode 1

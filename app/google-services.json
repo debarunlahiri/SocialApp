@@ -1,108 +1,41 @@
 {
   "project_info": {
-    "project_number": "149213320553",
-    "firebase_url": "https://takitym-2e39c-default-rtdb.firebaseio.com",
-    "project_id": "takitym-2e39c",
-    "storage_bucket": "takitym-2e39c.appspot.com"
+    "project_number": "472676034936",
+    "project_id": "taki-tym",
+    "storage_bucket": "taki-tym.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:149213320553:android:e460d85f1b4a96e92099f8",
+        "mobilesdk_app_id": "1:472676034936:android:fdb538d509de8f9f1e408d",
         "android_client_info": {
-          "package_name": "com.lahiriproductions.socialapp"
+          "package_name": "com.lahiriproductions.takitym"
         }
       },
       "oauth_client": [
         {
-          "client_id": "149213320553-ap9i46iohb4aduu4f3s3e8koo8ckrm0u.apps.googleusercontent.com",
+          "client_id": "472676034936-bshpmfi22aoefd0k627tkk3q5ks7cckm.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.lahiriproductions.socialapp",
-            "certificate_hash": "e951f66a8aeb655fa09e777dd30f25b7725d09c6"
+            "package_name": "com.lahiriproductions.takitym",
+            "certificate_hash": "9d06a1735ee54ab53be6f639e6676459d182a4ce"
           }
         },
         {
-          "client_id": "149213320553-5grje4p6qsfve8mbtqet9n13s58uqn7i.apps.googleusercontent.com",
+          "client_id": "472676034936-0c9johceck1f93gj1s5dqceah5g0bd7q.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyA6m6YzaPgj4WgGo3j4acWq1Tv8XYuit_U"
+          "current_key": "AIzaSyAxqBo2IqgFpz_ci7hlNROOzDm1IT_w_y0"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "149213320553-5grje4p6qsfve8mbtqet9n13s58uqn7i.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:149213320553:android:9302c42531c814d22099f8",
-        "android_client_info": {
-          "package_name": "com.takitym.takitym"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "149213320553-5grje4p6qsfve8mbtqet9n13s58uqn7i.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyA6m6YzaPgj4WgGo3j4acWq1Tv8XYuit_U"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "149213320553-5grje4p6qsfve8mbtqet9n13s58uqn7i.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:149213320553:android:d755a1066bc3bc032099f8",
-        "android_client_info": {
-          "package_name": "com.takitym.takityma"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "149213320553-f7jvr6gd7ddcpr7pj98s700e15h55gnb.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.takitym.takityma",
-            "certificate_hash": "56e96b689861f9ea9a7de0f6caef4c743a409dab"
-          }
-        },
-        {
-          "client_id": "149213320553-5grje4p6qsfve8mbtqet9n13s58uqn7i.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyA6m6YzaPgj4WgGo3j4acWq1Tv8XYuit_U"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "149213320553-5grje4p6qsfve8mbtqet9n13s58uqn7i.apps.googleusercontent.com",
+              "client_id": "472676034936-0c9johceck1f93gj1s5dqceah5g0bd7q.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

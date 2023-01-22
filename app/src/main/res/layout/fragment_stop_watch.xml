@@ -8,7 +8,7 @@
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -18,14 +18,51 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="25dp"
+                android:background="#29234b"
+                app:cardBackgroundColor="#211d44"
+                app:cardCornerRadius="100dp"
+                app:cardElevation="5dp">
+
+                <ImageView
+                    android:id="@+id/ivStopWatch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="100dp"
+                    android:layout_gravity="center"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/bgcircle"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/ivStopWatchHand"
+                    android:layout_width="wrap_content"
+                    android:layout_height="150dp"
+                    android:layout_gravity="center"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/icanchor"
+                    app:layout_constraintBottom_toBottomOf="@+id/ivStopWatch"
+                    app:layout_constraintEnd_toEndOf="@+id/ivStopWatch"
+                    app:layout_constraintStart_toStartOf="@+id/ivStopWatch"
+                    app:layout_constraintTop_toTopOf="@+id/ivStopWatch" />
+
+            </androidx.cardview.widget.CardView>
 
             <ImageView
                 android:id="@+id/imageView2"
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
                 android:layout_marginTop="50dp"
-                android:src="@drawable/app" />
+                android:src="@drawable/app"
+                android:visibility="gone" />
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/animationView"
@@ -134,6 +171,7 @@
                     android:text="Taki Round"
                     android:textAllCaps="false"
                     android:textSize="14sp"
+                    android:visibility="gone"
                     app:icon="@drawable/ic_outline_timer_24"
                     app:iconGravity="textStart"
                     app:layout_constraintBottom_toBottomOf="parent"
