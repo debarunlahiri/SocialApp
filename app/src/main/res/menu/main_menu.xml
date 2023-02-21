@@ -33,6 +33,7 @@
     <item
         android:id="@+id/sound_stop_menu_list_item"
         android:title="Sound Mix"
+        android:visible="false"
         />
     <item
         android:id="@+id/edit_profile_stop_menu_list_item"

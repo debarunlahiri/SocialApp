@@ -344,6 +344,7 @@ public class RadioFragment extends Fragment implements MediaPlayer.OnPreparedLis
 //                mediaPlayer.stop();
 //                mediaPlayer.reset();
                 streamingManager.onStop();
+                exoPlayer.stop();
                 Glide.with(getActivity()).load(R.drawable.ic_outline_play_arrow_24).into(ibRadioPlayPause);
             }
         });

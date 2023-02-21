@@ -1,41 +1,42 @@
 {
   "project_info": {
-    "project_number": "472676034936",
-    "project_id": "taki-tym",
-    "storage_bucket": "taki-tym.appspot.com"
+    "project_number": "444151154168",
+    "firebase_url": "https://takitym-df206-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "takitym-df206",
+    "storage_bucket": "takitym-df206.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:472676034936:android:fdb538d509de8f9f1e408d",
+        "mobilesdk_app_id": "1:444151154168:android:3aae30d4435ab746a5020d",
         "android_client_info": {
-          "package_name": "com.lahiriproductions.takitym"
+          "package_name": "com.lahiriproductions.taki_tym"
         }
       },
       "oauth_client": [
         {
-          "client_id": "472676034936-bshpmfi22aoefd0k627tkk3q5ks7cckm.apps.googleusercontent.com",
+          "client_id": "444151154168-q8var7pu9mta3ec6otm56tggg0vlt2cn.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.lahiriproductions.takitym",
+            "package_name": "com.lahiriproductions.taki_tym",
             "certificate_hash": "9d06a1735ee54ab53be6f639e6676459d182a4ce"
           }
         },
         {
-          "client_id": "472676034936-0c9johceck1f93gj1s5dqceah5g0bd7q.apps.googleusercontent.com",
+          "client_id": "444151154168-433jqa6620diuijpa5gsjgd8mq2bn8qq.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAxqBo2IqgFpz_ci7hlNROOzDm1IT_w_y0"
+          "current_key": "AIzaSyAfkKExcAC0Kvpt9_rJd-RDXSIW_hXtFQ4"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "472676034936-0c9johceck1f93gj1s5dqceah5g0bd7q.apps.googleusercontent.com",
+              "client_id": "444151154168-433jqa6620diuijpa5gsjgd8mq2bn8qq.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

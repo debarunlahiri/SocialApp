@@ -124,38 +124,32 @@ public class Controller {
         SharedPreferences sharedPreferences = mContext.getSharedPreferences("user_status", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         RequestQueue requestQueue = Volley.newRequestQueue(mContext);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, ApiInterface.API_GET_USER_STATUS, new com.android.volley.Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                if (response != null) {
-                    try {
-                        JSONObject jsonObject = new JSONObject(response);
-                        JSONObject jsonObjectUserStatus = jsonObject.getJSONObject("data");
-                        if (jsonObjectUserStatus != null) {
-                            Log.e(TAG, "onResponsedasda: " + jsonObjectUserStatus);
-                            String status = jsonObjectUserStatus.getString("user_status");
-                            if (status.equalsIgnoreCase("1")) {
-                                isStatus = true;
-                            } else {
-                                isStatus = false;
-                            }
-                        } else {
-                            isStatus = true;
-                        }
-                        editor.putBoolean("is_status", isStatus);
-                        editor.apply();
-                        Log.e(TAG, "onResponse: " + jsonObject);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, ApiInterface.API_GET_USER_STATUS, response -> {
+            if (response != null) {
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    Log.e(TAG, "getUserStatus: " + response);
+//                    JSONObject jsonObjectUserStatus = jsonObject.getJSONObject("status");
+                    int userStatus = jsonObject.getInt("status");
+                    if (userStatus != -1) {
+                        Log.e(TAG, "onResponsedasda: " + userStatus);
+//                        String status = jsonObjectUserStatus.getString("user_status");
+//                        if (userStatus == 1) {
+//                            isStatus = true;
+//                        } else {
+//                            isStatus = false;
+//                        }
+                    } else {
+                        isStatus = true;
                     }
+                    editor.putBoolean("is_status", isStatus);
+                    editor.apply();
+                    Log.e(TAG, "onResponse: " + jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
-        }, new com.android.volley.Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "onFailure: ", error);
-            }
-        }) {
+        }, error -> Log.e(TAG, "onFailure: ", error)) {
             @Nullable
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {

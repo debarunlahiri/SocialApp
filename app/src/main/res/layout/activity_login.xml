@@ -20,7 +20,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
-        app:lottie_url="https://assets10.lottiefiles.com/packages/lf20_q5pk6p1k.json" />
+        app:lottie_fileName="58159-social-media-marketing.json"/>
 
     <com.tomer.fadingtextview.FadingTextView
         android:id="@+id/fadingTextView"

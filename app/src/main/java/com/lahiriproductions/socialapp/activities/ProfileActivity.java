@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -103,7 +104,7 @@ public class ProfileActivity extends AppCompatActivity {
         tilProfileEmail = findViewById(R.id.tilProfileEmail);
         tilProfileAge = findViewById(R.id.tilProfileAge);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase = FirebaseDatabase.getInstance().getReferenceFromUrl("https://takitym-df206-default-rtdb.asia-southeast1.firebasedatabase.app/");
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         mStorage = FirebaseStorage.getInstance();
@@ -193,13 +194,13 @@ public class ProfileActivity extends AppCompatActivity {
                 } else if (!Controller.isValidEmail(email)) {
                     tilProfileEmail.setError("Please enter valid email");
                 } else {
-                    if (Controller.getUserStatus(mContext, mAuth.getCurrentUser().getUid())) {
-                        updateProfile(name, email, age);
-                    } else {
-                        Toast.makeText(ProfileActivity.this, "You have been blocked", Toast.LENGTH_SHORT).show();
-                        Controller.logout(ProfileActivity.this, mAuth);
-                    }
                     updateProfile(name, email, age);
+//                    if (Controller.getUserStatus(mContext, mAuth.getCurrentUser().getUid())) {
+//                        updateProfile(name, email, age);
+//                    } else {
+//                        Toast.makeText(ProfileActivity.this, "You have been blocked", Toast.LENGTH_SHORT).show();
+//                        Controller.logout(ProfileActivity.this, mAuth);
+//                    }
                 }
             }
         });
@@ -248,6 +249,13 @@ public class ProfileActivity extends AppCompatActivity {
                     String errMsg = task.getException().getMessage();
                     Toast.makeText(getApplicationContext(), "Error: " + errMsg, Toast.LENGTH_LONG).show();
                 }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                String errMsg = e.getMessage();
+                Toast.makeText(getApplicationContext(), "failure: " + errMsg, Toast.LENGTH_LONG).show();
+                Log.e(TAG, "onFailure: ", e);
             }
         });
     }

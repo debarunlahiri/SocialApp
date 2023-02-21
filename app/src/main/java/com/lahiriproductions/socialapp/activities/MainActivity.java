@@ -120,10 +120,10 @@ public class MainActivity extends AppCompatActivity {
             sendToMain();
         } else {
             Log.e(TAG, "onCreate: " + Controller.getUserStatus(mContext, mAuth.getCurrentUser().getUid()));
-            if (!Controller.getUserStatus(mContext, mAuth.getCurrentUser().getUid())) {
-                Toast.makeText(MainActivity.this, "You have been blocked", Toast.LENGTH_SHORT).show();
-                Controller.logout(mContext, mAuth);
-            }
+//            if (!Controller.getUserStatus(mContext, mAuth.getCurrentUser().getUid())) {
+//                Toast.makeText(MainActivity.this, "You have been blocked", Toast.LENGTH_SHORT).show();
+//                Controller.logout(mContext, mAuth);
+//            }
             mDatabase.child("users").child(mAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -283,7 +283,11 @@ public class MainActivity extends AppCompatActivity {
                 params.put("email", email);
                 params.put("user_id", mAuth.getCurrentUser().getUid());
                 params.put("age", age);
-                params.put("image", profile_image);
+                if (profile_image != null) {
+                    params.put("image", profile_image);
+                } else {
+                    params.put("image", ApiInterface.DEFAULT_PROFILE_PIC);
+                }
                 params.put("username", mAuth.getCurrentUser().getPhoneNumber());
                 params.put("password", "password");
                 return params;
@@ -296,6 +300,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+        for (int i=0; i<menu.size(); i++) {
+            if (i != menu.size()-1) {
+                menu.getItem(i).setVisible(false);
+            }
+        }
+
 //        if (vpMain.getCurrentItem() == 1) {
 //            menu.findItem(R.id.baby_mix_stop_menu_list_item).setVisible(true);
 //            menu.findItem(R.id.tabu_mix_stop_menu_list_item).setVisible(true);
@@ -325,40 +335,45 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.tabu_mix_stop_menu_list_item:
                 soundRecordingIntent.putExtra("list_type", "tabu_mix");
+                soundRecordingIntent.putExtra("recording_header", "Tabu Mix 18+");
                 startActivity(soundRecordingIntent);
                 Variables.isRingtoneOn = false;
                 return true;
 
             case R.id.qito_mix_stop_menu_list_item:
                 soundRecordingIntent.putExtra("list_type", "qito_mix");
+                soundRecordingIntent.putExtra("recording_header", "Qito Mix");
                 startActivity(soundRecordingIntent);
                 Variables.isRingtoneOn = false;
                 return true;
 
             case R.id.kece_mix_stop_menu_list_item:
-//                soundRecordingIntent.putExtra("list_type", "kece_mix");
-//                startActivity(soundRecordingIntent);
+                soundRecordingIntent.putExtra("list_type", "kece_mix");
+                soundRecordingIntent.putExtra("recording_header", "Kece Mix");
+                startActivity(soundRecordingIntent);
                 Variables.isRingtoneOn = true;
-                Toast.makeText(mContext, "Random ringtone enabled", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContext, "Random ringtone enabled", Toast.LENGTH_SHORT).show();
                 return true;
 
             case R.id.normal_stop_menu_list_item:
                 soundRecordingIntent.putExtra("list_type", "normal");
+                soundRecordingIntent.putExtra("recording_header", "Normal Mix");
                 startActivity(soundRecordingIntent);
                 Variables.isRingtoneOn = false;
                 return true;
 
             case R.id.adult_stop_menu_list_item:
                 soundRecordingIntent.putExtra("list_type", "adult");
+                soundRecordingIntent.putExtra("recording_header", "Adult Mix");
                 startActivity(soundRecordingIntent);
                 Variables.isRingtoneOn = false;
                 return true;
 
-            case R.id.sound_stop_menu_list_item:
-                soundRecordingIntent.putExtra("list_type", "sound");
-                startActivity(soundRecordingIntent);
-                Variables.isRingtoneOn = false;
-                return true;
+//            case R.id.sound_stop_menu_list_item:
+//                soundRecordingIntent.putExtra("list_type", "sound");
+//                startActivity(soundRecordingIntent);
+//                Variables.isRingtoneOn = false;
+//                return true;
 
             case R.id.edit_profile_stop_menu_list_item:
                 Intent profileIntent = new Intent(MainActivity.this, ProfileActivity.class);

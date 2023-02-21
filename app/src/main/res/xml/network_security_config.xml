@@ -25,5 +25,6 @@
         <domain includeSubdomains="true">wnyc.org</domain>
         <domain includeSubdomains="true">wostreaming.net</domain>
         <domain includeSubdomains="true">streamon.fm</domain>
+        <domain includeSubdomains="true">calimak.com</domain>
     </domain-config>
 </network-security-config>

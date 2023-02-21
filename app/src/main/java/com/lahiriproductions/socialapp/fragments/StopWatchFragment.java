@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -38,6 +39,8 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.lahiriproductions.socialapp.R;
+import com.lahiriproductions.socialapp.activities.MainActivity;
+import com.lahiriproductions.socialapp.activities.ProfileActivity;
 import com.lahiriproductions.socialapp.activities.SoundRecordingsActivity;
 import com.lahiriproductions.socialapp.adapter.StopWatchLapAdapter;
 import com.lahiriproductions.socialapp.models.StopWatchLap;
@@ -196,152 +199,28 @@ public class StopWatchFragment extends Fragment {
         ibPlayPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    if (entered_time < 0) {
-                        showSelectSecondDialog();
-                    } else {
-                        if (stopwatch.isStarted() && !stopwatch.isPaused()) {
-                            stopwatch.pause();
-                            ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_play_arrow_24, 0, 0, 0);
-                            ibPlayPause.setText("Resume");
-                            animation.pause();
-                        } else if (stopwatch.isPaused()) {
-                            stopwatch.resume();
-                            ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_pause_24, 0, 0, 0);
-                            ibPlayPause.setText("Pause");
-                            animation.resume();
-                        } else {
-                            if (selectedAudioPath != null) {
-                                tvSelectedAudioName.setVisibility(View.VISIBLE);
-                            } else {
-                                tvSelectedAudioName.setVisibility(View.GONE);
-                            }
-                            stopwatch.start();
-                            ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_pause_24, 0, 0, 0);
-                            ibPlayPause.setText("Pause");
-                            animation.start();
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                stopwatch.setTextView(tvStopWatch);
-
+                playPauseStopWatch();
             }
         });
 
         ibPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    isPaused = true;
-                    stopwatch.pause();
-                    stopwatch.setTextView(tvStopWatch);
-                    ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_play_arrow_24, 0, 0, 0);
-                    if (selectedAudioPath != null) {
-                        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                            mediaPlayer.stop();
-                        }
-                    } else {
-                        if (randomMP != null && randomMP.isPlaying()) {
-                            randomMP.stop();
-                            randomMP = null;
-                        }
-                        if (ringtone != null && ringtone.isPlaying()) {
-                            ringtone.stop();
-                        }
-                        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                            mediaPlayer.stop();
-                        }
-                    }
-                    if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                        mediaPlayer.stop();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                pauseStopWatch();
             }
         });
 
         ibReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    isReset = true;
-                    tvStopWatch.setText("0.00s");
-                    if (stopwatch.isStarted()) {
-                        stopwatch.stop();
-                    }
-                    if (randomMP != null && randomMP.isPlaying()) {
-                        randomMP.stop();
-                    }
-                    if (ringtone != null && ringtone.isPlaying()) {
-                        ringtone.stop();
-                    }
-                    if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                        mediaPlayer.stop();
-                    }
-                    stopWatchLapList.clear();
-                    stopWatchLapAdapter.notifyDataSetChanged();
-                    ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_play_arrow_24, 0, 0, 0);
-                    ibPlayPause.setText("Start");
-                    lapMilLi = 0;
-                    entered_time = -1;
-                    animation.end();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
+                resetStopWatch();
             }
         });
 
         stopwatch.setOnTickListener(new Stopwatch.OnTickListener() {
             @Override
             public void onTick(Stopwatch stopwatch) {
-                try {
-                    if (lapMilLi != 0 && stopwatch.getElapsedTime() >= lapMilLi) {
-                        stopWatchLapList.add(new StopWatchLap(stopwatch.getElapsedTime()));
-                        stopWatchLapAdapter.setStopWatchLapList(stopWatchLapList);
-                        stopwatch.stop();
-                        stopwatch.start();
-                        if (Variables.isRingtoneOn) {
-                            if (randomMP != null && randomMP.isPlaying()) {
-                                randomMP.stop();
-                            }
-                            playRandomSound();
-                        } else {
-                            if (selectedAudioPath != null) {
-                                mediaPlayer.start();
-                                Log.e(TAG, "onTick: " + (mediaPlayer.getDuration()));
-                                if (mediaPlayer.getDuration() > lapMilLi) {
-                                    if (!isDurationMessageShown) {
-                                        new MaterialDialog.Builder(getActivity())
-                                                .title("Info")
-                                                .content("Your audio duration is greater than your lap time. Your sound may get overlap with other lap times.")
-                                                .positiveText("Okay")
-                                                .show();
-                                        isDurationMessageShown = true;
-                                    }
-
-                                }
-                            } else {
-//                                try {
-//                                    if (ringtoneUri != null) {
-//                                        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-//                                        ringtone = RingtoneManager.getRingtone(mContext, notification);
-//                                    }
-//                                    ringtone.play();
-//                                } catch (Exception e) {
-//                                    e.printStackTrace();
-//                                }
-                            }
-                        }
-
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                stopWatchTick();
 
             }
         });
@@ -349,15 +228,7 @@ public class StopWatchFragment extends Fragment {
         bSetLap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (stopwatch.isStarted()) {
-                    lapMilLi = stopwatch.getElapsedTime();
-                    stopwatch.stop();
-                    stopwatch.start();
-                    Log.e(TAG, "lapMilLi: " + String.format("%d", lapMilLi));
-                } else {
-                    Toast.makeText(mContext, "Cannot set lap time when stop watch is paused", Toast.LENGTH_SHORT).show();
-                }
-
+                setLap();
             }
         });
 
@@ -370,11 +241,233 @@ public class StopWatchFragment extends Fragment {
         });
     }
 
+    private void stopWatchTick() {
+        try {
+            if (lapMilLi != 0 && stopwatch.getElapsedTime() >= lapMilLi) {
+                stopWatchLapList.add(new StopWatchLap(stopwatch.getElapsedTime()));
+                stopWatchLapAdapter.setStopWatchLapList(stopWatchLapList);
+                stopwatch.stop();
+                stopwatch.start();
+                if (Variables.isRingtoneOn) {
+                    if (randomMP != null && randomMP.isPlaying()) {
+                        randomMP.stop();
+                    }
+                    playRandomSound();
+                } else {
+                    if (selectedAudioPath != null) {
+                        mediaPlayer.start();
+                        Log.e(TAG, "onTick: " + (mediaPlayer.getDuration()));
+                        if (mediaPlayer.getDuration() > lapMilLi) {
+                            if (!isDurationMessageShown) {
+                                new MaterialDialog.Builder(getActivity())
+                                        .title("Info")
+                                        .content("Your audio duration is greater than your lap time. Your sound may get overlap with other lap times.")
+                                        .positiveText("Okay")
+                                        .show();
+                                isDurationMessageShown = true;
+                            }
+
+                        }
+                    } else {
+//                                try {
+//                                    if (ringtoneUri != null) {
+//                                        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+//                                        ringtone = RingtoneManager.getRingtone(mContext, notification);
+//                                    }
+//                                    ringtone.play();
+//                                } catch (Exception e) {
+//                                    e.printStackTrace();
+//                                }
+                    }
+                }
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void playPauseStopWatch() {
+        try {
+            if (entered_time < 0) {
+                showSelectSecondDialog();
+            } else {
+                if (stopwatch.isStarted() && !stopwatch.isPaused()) {
+                    stopwatch.pause();
+                    ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_play_arrow_24, 0, 0, 0);
+                    ibPlayPause.setText("Resume");
+                    animation.pause();
+                    isPaused = true;
+                    Toast.makeText(mContext, "Stopwatch Paused", Toast.LENGTH_SHORT).show();
+                } else if (stopwatch.isPaused()) {
+                    stopwatch.resume();
+                    ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_pause_24, 0, 0, 0);
+                    ibPlayPause.setText("Pause");
+                    animation.resume();
+                    isPaused = false;
+                    Toast.makeText(mContext, "Stopwatch Resumed", Toast.LENGTH_SHORT).show();
+                } else {
+                    if (selectedAudioPath != null) {
+                        tvSelectedAudioName.setVisibility(View.VISIBLE);
+                    } else {
+                        tvSelectedAudioName.setVisibility(View.GONE);
+                    }
+                    stopwatch.start();
+                    ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_pause_24, 0, 0, 0);
+                    ibPlayPause.setText("Pause");
+                    animation.start();
+                    isPaused = false;
+                    Toast.makeText(mContext, "Stopwatch Started", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        stopwatch.setTextView(tvStopWatch);
+    }
+
+    private void pauseStopWatch() {
+        try {
+            isPaused = true;
+            stopwatch.pause();
+            stopwatch.setTextView(tvStopWatch);
+            ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_play_arrow_24, 0, 0, 0);
+            if (selectedAudioPath != null) {
+                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                    mediaPlayer.stop();
+                }
+            } else {
+                if (randomMP != null && randomMP.isPlaying()) {
+                    randomMP.stop();
+                    randomMP = null;
+                }
+                if (ringtone != null && ringtone.isPlaying()) {
+                    ringtone.stop();
+                }
+                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                    mediaPlayer.stop();
+                }
+            }
+            if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                mediaPlayer.stop();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void resetStopWatch() {
+        try {
+            isReset = true;
+            tvStopWatch.setText("0.00s");
+            if (stopwatch.isStarted()) {
+                stopwatch.stop();
+            }
+            if (randomMP != null && randomMP.isPlaying()) {
+                randomMP.stop();
+            }
+            if (ringtone != null && ringtone.isPlaying()) {
+                ringtone.stop();
+            }
+            if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                mediaPlayer.stop();
+            }
+            stopWatchLapList.clear();
+            stopWatchLapAdapter.notifyDataSetChanged();
+            ibPlayPause.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_outline_play_arrow_24, 0, 0, 0);
+            ibPlayPause.setText("Start");
+            lapMilLi = 0;
+            entered_time = -1;
+            animation.end();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setLap() {
+        if (stopwatch.isStarted()) {
+            lapMilLi = stopwatch.getElapsedTime();
+            stopwatch.stop();
+            stopwatch.start();
+            Log.e(TAG, "lapMilLi: " + String.format("%d", lapMilLi));
+        } else {
+            Toast.makeText(mContext, "Cannot set lap time when stop watch is paused", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void showPopup(View v) {
         PopupMenu popup = new PopupMenu(requireContext(), v);
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.main_menu, popup.getMenu());
         popup.show();
+        popup.getMenu().getItem(7).setVisible(false);
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if (stopwatch.isStarted()) {
+                    playPauseStopWatch();
+                }
+                Intent soundRecordingIntent = new Intent(requireContext(), SoundRecordingsActivity.class);
+                switch (item.getItemId()) {
+                    case R.id.baby_mix_stop_menu_list_item:
+                        Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+                        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_RINGTONE);
+                        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
+                        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
+                        startActivityForResult(intent, 5);
+                        Variables.isRingtoneOn = false;
+                        return true;
+
+                    case R.id.tabu_mix_stop_menu_list_item:
+                        soundRecordingIntent.putExtra("list_type", "tabu_mix");
+                        startActivity(soundRecordingIntent);
+                        Variables.isRingtoneOn = false;
+                        return true;
+
+                    case R.id.qito_mix_stop_menu_list_item:
+                        soundRecordingIntent.putExtra("list_type", "qito_mix");
+                        startActivity(soundRecordingIntent);
+                        Variables.isRingtoneOn = false;
+                        return true;
+
+                    case R.id.kece_mix_stop_menu_list_item:
+//                soundRecordingIntent.putExtra("list_type", "kece_mix");
+//                startActivity(soundRecordingIntent);
+                        Variables.isRingtoneOn = true;
+                        Toast.makeText(mContext, "Random ringtone enabled", Toast.LENGTH_SHORT).show();
+                        return true;
+
+                    case R.id.normal_stop_menu_list_item:
+                        soundRecordingIntent.putExtra("list_type", "normal");
+                        startActivity(soundRecordingIntent);
+                        Variables.isRingtoneOn = false;
+                        return true;
+
+                    case R.id.adult_stop_menu_list_item:
+                        soundRecordingIntent.putExtra("list_type", "adult");
+                        startActivity(soundRecordingIntent);
+                        Variables.isRingtoneOn = false;
+                        return true;
+
+                    case R.id.sound_stop_menu_list_item:
+                        soundRecordingIntent.putExtra("list_type", "sound");
+                        startActivity(soundRecordingIntent);
+                        Variables.isRingtoneOn = false;
+                        return true;
+
+                    case R.id.edit_profile_stop_menu_list_item:
+                        Intent profileIntent = new Intent(requireContext(), ProfileActivity.class);
+                        profileIntent.putExtra("isEdit", true);
+                        startActivity(profileIntent);
+                        return true;
+
+                    default:
+                        return onOptionsItemSelected(item);
+                }
+            }
+        });
 
     }
 
@@ -390,6 +483,13 @@ public class StopWatchFragment extends Fragment {
         Button bDialogSaveSecond = dialog.findViewById(R.id.bDialogSaveSecond);
         ImageButton ibDialogEnterSecondClose = dialog.findViewById(R.id.ibDialogEnterSecondClose);
 
+        ibDialogEnterSecondClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
         bDialogSaveSecond.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -398,7 +498,7 @@ public class StopWatchFragment extends Fragment {
                 if (selected_time.isEmpty()) {
                     tilEnterSecond.setError("Please enter minutes");
                 } else {
-                    entered_time = TimeUnit.MINUTES.toMillis(Long.parseLong(selected_time));
+                    entered_time = TimeUnit.MINUTES.toMillis(Long.parseLong(String.valueOf(Math.round(Double.parseDouble(selected_time)))));
                     lapMilLi = entered_time;
                     animation.setDuration(lapMilLi);
                     Log.e(TAG, "onClick: " + lapMilLi);
@@ -446,6 +546,9 @@ public class StopWatchFragment extends Fragment {
             ringtone = RingtoneManager.getRingtone(mContext, ringtoneUri);
             isSelectedAudio = false;
         }
+        if (isPaused) {
+            playPauseStopWatch();
+        }
         mContext.registerReceiver(br, new IntentFilter(MyBroadcastService.COUNTDOWN_BR));
         Log.i(TAG, "Registered broacast receiver");
     }
@@ -453,7 +556,7 @@ public class StopWatchFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        mContext.unregisterReceiver(br);
+//        mContext.unregisterReceiver(br);
         Log.i(TAG, "Unregistered broacast receiver");
     }
 
@@ -468,7 +571,7 @@ public class StopWatchFragment extends Fragment {
     }
     @Override
     public void onDestroy() {
-        mContext.stopService(new Intent(mContext, MyBroadcastService.class));
+//        mContext.stopService(new Intent(mContext, MyBroadcastService.class));
         Log.i(TAG, "Stopped service");
         super.onDestroy();
     }
@@ -479,6 +582,8 @@ public class StopWatchFragment extends Fragment {
             stopwatch.setTextView(tvStopWatch);
         }
     }
+
+
 
 
 }

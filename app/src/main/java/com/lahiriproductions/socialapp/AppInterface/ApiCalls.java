@@ -29,8 +29,20 @@ public interface ApiCalls {
     Call<com.lahiriproductions.socialapp.events.Events> getEvents();
 
     @Headers("Content-Type: application/json")
-    @GET("index/api_mobile/ring")
-    Call<QitoRingtone> getRingtones(@Path("api_number") String api_number);
+    @GET(ApiInterface.API_GET_RINGTONE)
+    Call<QitoRingtone> getRingtones();
+
+    @Headers("Content-Type: application/json")
+    @GET(ApiInterface.API_GET_RINGTONE_1)
+    Call<QitoRingtone> getRingtones1();
+
+    @Headers("Content-Type: application/json")
+    @GET(ApiInterface.API_GET_RINGTONE_2)
+    Call<QitoRingtone> getRingtones2();
+
+    @Headers("Content-Type: application/json")
+    @GET(ApiInterface.API_GET_RINGTONE_3)
+    Call<QitoRingtone> getRingtones3();
 
     @POST(ApiInterface.API_INSERT_NOTIFICATION)
     @FormUrlEncoded

@@ -46,7 +46,7 @@
                     android:layout_marginEnd="16dp"
                     android:layout_marginBottom="8dp"
                     android:background="@null"
-                    android:tint="@color/black"
+                    app:tint="@color/black"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -65,7 +65,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Enter Minute"
-                    android:inputType="numberSigned" />
+                    android:maxLength="3"
+                    android:digits="0123456789"
+                    android:inputType="number|none" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <Button

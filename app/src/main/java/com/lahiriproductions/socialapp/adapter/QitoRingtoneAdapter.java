@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.lahiriproductions.socialapp.R;
-import com.lahiriproductions.socialapp.models.QitoRingtone;
 import com.lahiriproductions.socialapp.utils.Constants;
 import com.lahiriproductions.socialapp.utils.Controller;
 
@@ -33,8 +32,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 
 public class QitoRingtoneAdapter extends RecyclerView.Adapter<QitoRingtoneAdapter.ViewHolder> {
 
@@ -48,15 +47,23 @@ public class QitoRingtoneAdapter extends RecyclerView.Adapter<QitoRingtoneAdapte
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
+    private String list_type;
 
+    private OnItemClickListener onItemClickListener;
 
-    public QitoRingtoneAdapter(Context mContext, List<String> qitoRingtoneList) {
+    public QitoRingtoneAdapter(Context mContext, List<String> qitoRingtoneList, OnItemClickListener onItemClickListener) {
         this.mContext = mContext;
         this.qitoRingtoneList = qitoRingtoneList;
+        this.onItemClickListener = onItemClickListener;
     }
 
     public void setQitoRingtoneList(List<String> qitoRingtoneList) {
         this.qitoRingtoneList = qitoRingtoneList;
+        notifyDataSetChanged();
+    }
+
+    public void setListType(String list_type) {
+        this.list_type = list_type;
         notifyDataSetChanged();
     }
 
@@ -81,36 +88,21 @@ public class QitoRingtoneAdapter extends RecyclerView.Adapter<QitoRingtoneAdapte
             playingHolder = holder;
             // this view holder corresponds to the currently playing audio cell
             // update its view to show playing progress
-            updatePlayingView();
+//            updatePlayingView();
         } else {
             // and this one corresponds to non playing
-            updateNonPlayingView(holder);
+//            updateNonPlayingView(holder);
         }
+        if (Objects.equals(list_type, "qito_mix")) {
+            holder.ivSoundDelete.setVisibility(View.VISIBLE);
+        } else {
+            holder.ivSoundDelete.setVisibility(View.GONE);
+        }
+
         holder.cvSoundRecording.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    if (position == currentPlayingPosition) {
-                        if (mediaPlayer.isPlaying()) {
-                            mediaPlayer.pause();
-                        } else {
-                            mediaPlayer.start();
-                        }
-                    } else {
-                        currentPlayingPosition = position;
-                        if (mediaPlayer != null) {
-                            if (null != holder) {
-                                updateNonPlayingView(playingHolder);
-                            }
-                            mediaPlayer.release();
-                        }
-                        playingHolder = holder;
-                        startMediaPlayer(string, holder);
-                    }
-                    updatePlayingView();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                onItemClickListener.onItemClick(string, holder, position, qitoRingtoneList);
 
             }
         });
@@ -181,57 +173,17 @@ public class QitoRingtoneAdapter extends RecyclerView.Adapter<QitoRingtoneAdapte
         return mType;
     }
 
-    private void updateNonPlayingView(ViewHolder holder) {
+    private void updateNonPlayingView(QitoRingtoneAdapter.ViewHolder holder) {
 //        holder.sbProgress.removeCallbacks(seekBarUpdater);
 //        holder.sbProgress.setEnabled(false);
 //        holder.sbProgress.setProgress(0);
 //        holder.ivPlayPause.setImageResource(R.drawable.ic_play_arrow);
-        holder.animationView.setVisibility(View.GONE);
-        holder.ivMusicArt.setVisibility(View.VISIBLE);
+//        holder.animationView.setVisibility(View.GONE);
+//        holder.ivMusicArt.setVisibility(View.VISIBLE);
 
     }
 
-    private void updatePlayingView() {
-//        playingHolder.sbProgress.setMax(mediaPlayer.getDuration());
-//        playingHolder.sbProgress.setProgress(mediaPlayer.getCurrentPosition());
-//        playingHolder.sbProgress.setEnabled(true);
-//        if (mediaPlayer.isPlaying()) {
-//            playingHolder.sbProgress.postDelayed(seekBarUpdater, 100);
-//            playingHolder.ivPlayPause.setImageResource(R.drawable.ic_pause);
-//        } else {
-//            playingHolder.sbProgress.removeCallbacks(seekBarUpdater);
-//            playingHolder.ivPlayPause.setImageResource(R.drawable.ic_play_arrow);
-//        }
-        if (mediaPlayer.isPlaying()) {
-            playingHolder.animationView.setVisibility(View.VISIBLE);
-            playingHolder.ivMusicArt.setVisibility(View.GONE);
-        } else {
-            playingHolder.animationView.setVisibility(View.GONE);
-            playingHolder.ivMusicArt.setVisibility(View.VISIBLE);
-        }
-    }
-
-    private void startMediaPlayer(String audioFile, ViewHolder holder) {
-        mediaPlayer = MediaPlayer.create(mContext, Uri.parse(audioFile));
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                releaseMediaPlayer();
-                playingHolder.animationView.setVisibility(View.GONE);
-                playingHolder.ivMusicArt.setVisibility(View.VISIBLE);
-            }
-        });
-        mediaPlayer.start();
-    }
-
-    private void releaseMediaPlayer() {
-        if (null != playingHolder) {
-            updateNonPlayingView(playingHolder);
-        }
-        mediaPlayer.release();
-        mediaPlayer = null;
-        currentPlayingPosition = -1;
-    }
+    
 
     @Override
     public void onViewRecycled(ViewHolder holder) {
@@ -251,10 +203,10 @@ public class QitoRingtoneAdapter extends RecyclerView.Adapter<QitoRingtoneAdapte
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView tvSoundFileName, tvSoundFileFormat;
-        private CardView cvSoundRecording;
-        private ImageView ivSoundSelect, ivMusicArt, ivSetRingtone;
-        private LottieAnimationView animationView;
+        public TextView tvSoundFileName, tvSoundFileFormat;
+        public CardView cvSoundRecording;
+        public ImageView ivSoundSelect, ivMusicArt, ivSetRingtone, ivSoundDelete;
+        public LottieAnimationView animationView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -266,10 +218,16 @@ public class QitoRingtoneAdapter extends RecyclerView.Adapter<QitoRingtoneAdapte
             animationView = itemView.findViewById(R.id.animationView);
             ivMusicArt = itemView.findViewById(R.id.ivMusicArt);
             ivSetRingtone = itemView.findViewById(R.id.ivSetRingtone);
+            ivSoundDelete = itemView.findViewById(R.id.ivSoundDelete);
+        }
+
+        public void bindData(String string) {
+            updateNonPlayingView(playingHolder);
         }
     }
 
     public interface OnItemClickListener {
-        void onItemClick(File soundRecordings);
+
+        void onItemClick(String string, ViewHolder holder, int position, List<String> qitoRingtoneList);
     }
 }

@@ -1,13 +1,12 @@
 package com.lahiriproductions.socialapp.adapter;
 
 import android.annotation.SuppressLint;
-import android.content.ContentResolver;
-import android.content.ContentUris;
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -24,16 +23,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.helper.widget.Layer;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.lahiriproductions.socialapp.R;
-import com.lahiriproductions.socialapp.activities.SoundRecordingsActivity;
-import com.lahiriproductions.socialapp.models.SoundRecordings;
 import com.lahiriproductions.socialapp.utils.Constants;
 import com.lahiriproductions.socialapp.utils.Controller;
-import com.lahiriproductions.socialapp.utils.FileUtil;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -41,6 +36,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Objects;
 
 public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordingsAdapter.ViewHolder> {
 
@@ -56,6 +52,8 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
 
+    private String list_type;
+
     public SoundRecordingsAdapter(Context mContext, List<File> soundRecordingsList, OnItemClickListener onItemClickListener) {
         this.mContext = mContext;
         this.soundRecordingsList = soundRecordingsList;
@@ -64,6 +62,11 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
 
     public void setSoundRecordingsList(List<File> soundRecordingsList) {
         this.soundRecordingsList = soundRecordingsList;
+        notifyDataSetChanged();
+    }
+
+    public void setListType(String list_type) {
+        this.list_type = list_type;
         notifyDataSetChanged();
     }
 
@@ -91,6 +94,11 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
         } else {
             // and this one corresponds to non playing
             updateNonPlayingView(holder);
+        }
+        if (Objects.equals(list_type, "qito_mix")) {
+            holder.ivSoundDelete.setVisibility(View.VISIBLE);
+        } else {
+            holder.ivSoundDelete.setVisibility(View.GONE);
         }
         holder.cvSoundRecording.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,7 +151,16 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
 
             }
         });
+
+        holder.ivSoundDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onItemClickListener.onItemDelete(soundRecordings, position, soundRecordingsList);
+            }
+        });
     }
+
+
 
     private boolean checkSystemWritePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -222,12 +239,14 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
 //            playingHolder.sbProgress.removeCallbacks(seekBarUpdater);
 //            playingHolder.ivPlayPause.setImageResource(R.drawable.ic_play_arrow);
 //        }
-        if (mediaPlayer.isPlaying()) {
-            playingHolder.animationView.setVisibility(View.VISIBLE);
-            playingHolder.ivMusicArt.setVisibility(View.GONE);
-        } else {
-            playingHolder.animationView.setVisibility(View.GONE);
-            playingHolder.ivMusicArt.setVisibility(View.VISIBLE);
+        if (mediaPlayer != null) {
+            if (mediaPlayer.isPlaying()) {
+                playingHolder.animationView.setVisibility(View.VISIBLE);
+                playingHolder.ivMusicArt.setVisibility(View.GONE);
+            } else {
+                playingHolder.animationView.setVisibility(View.GONE);
+                playingHolder.ivMusicArt.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -269,11 +288,16 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
         return soundRecordingsList.size();
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView tvSoundFileName, tvSoundFileFormat;
         private CardView cvSoundRecording;
-        private ImageView ivSoundSelect, ivMusicArt, ivSetRingtone;
+        private ImageView ivSoundSelect, ivMusicArt, ivSetRingtone, ivSoundDelete;
         private LottieAnimationView animationView;
 
         public ViewHolder(@NonNull View itemView) {
@@ -286,10 +310,12 @@ public class SoundRecordingsAdapter extends RecyclerView.Adapter<SoundRecordings
             animationView = itemView.findViewById(R.id.animationView);
             ivMusicArt = itemView.findViewById(R.id.ivMusicArt);
             ivSetRingtone = itemView.findViewById(R.id.ivSetRingtone);
+            ivSoundDelete = itemView.findViewById(R.id.ivSoundDelete);
         }
     }
 
     public interface OnItemClickListener {
         void onItemClick(File soundRecordings);
+        void onItemDelete(File soundRecordings, int position, List<File> soundRecordingsList);
     }
 }
